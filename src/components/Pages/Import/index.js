@@ -1,6 +1,6 @@
-import Sidebar from "../../Sidebar";
-import Header from "../../header";
-import Loader from "../../loader";
+import Sidebar from "../../Layout/Sidebar";
+import Header from "../../Layout/Header";
+// import Loader from "../../loader";
 import "../../../assets/scss/import.scss";
 import Upload from "../../../assets/images/Upload.svg"
 // import IcoMore from "../../../assets/images/more.svg"
