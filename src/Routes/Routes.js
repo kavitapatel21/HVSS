@@ -2,6 +2,7 @@
 // import Register from "../components/Register"; 
 import Import from "../components/Pages/Import/index"; 
 import AddColumnRules from "../components/Pages/Import/AddColumnRules"; 
+import ExtractedData from "../components/Pages/Import/ExtractData"; 
 import Subcodes from "../components/Pages/subcodes/index"; 
 import AddRules from "../components/Pages/subcodes/AddRule"; 
 import Login from "../components/Pages/Login/Login";
@@ -38,7 +39,12 @@ const routesData = [
     path: "/add-column",
     element: <AddColumnRules />,
     title: "addcolumn"
-  },
+  },,
+  {
+    path: "/extract",
+    element: <ExtractedData />,
+    title: "extractdata"
+  }, 
   {
     path: "/subcodes",
     element: <Subcodes />,

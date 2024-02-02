@@ -4,7 +4,7 @@ import Header from "../../Layout/Header";
 import "../../../assets/scss/import.scss";
 import Addrule from "../../../assets/images/add-rule.svg";
 import IcoMore from "../../../assets/images/more.svg";
-import IcoSearch from "../../../assets/images/search.svg";
+import IcoSearch from "../../../assets/images/search_ico.svg";
 import { Dropdown } from "react-bootstrap";
 
 const Subcodes = () => {
