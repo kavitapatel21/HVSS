@@ -1,0 +1,40 @@
+:root {
+    --primary: #147594;
+    --white: #ffffff;
+    --black: #121212;
+    --hover: #1497c2;
+    --border: #E6E6EB;
+  }
+
+.top-divider{
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    opacity: 1;
+}
+.new-rule{
+  .rule-no {
+    max-width: 25px;
+    width: 100%;
+    display: block; 
+  }
+  input,select{
+    height: 40px;
+    appearance: none;
+    background-color: transparent;
+    z-index: 1;
+    position: relative;
+    cursor: pointer;
+  }
+  .confition-input{
+    max-width: 70px;
+    width: 100%;
+  }
+  .set-conition{
+    max-width: 120px;
+    width: 100%;
+  }
+  .select-rules{
+    max-width: 200px;
+    width: 100%;
+  }
+}

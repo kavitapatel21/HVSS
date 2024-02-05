@@ -3,7 +3,9 @@
     max-width: 236px;
     width: 100%;
     min-height: 100vh;
-    padding: 40px 8px;
+    padding: 40px 8px; 
+    z-index: 9999;
+    transition: all ease-in-out 0.3s;
     .hvss-menu{
         a{
             padding: 16px;

@@ -43,3 +43,34 @@
         }
     }
 }
+
+.column-names{
+    .regular-title{
+        max-width: 200px;
+        width: 100%;
+    }    
+    .select-column{
+        max-width: 400px;
+        width: 100%;
+        select{
+            appearance: none;
+            background-color: transparent;    
+            z-index: 1;
+            position: relative;
+            cursor: pointer;
+            height: 44px;
+        }
+    }
+}
+.rule-input{
+    max-width: 100px;
+    width: 100%;
+    input{
+        height: 44px;
+    }
+}
+.extract{
+    td{
+        padding: 8px 15px !important;
+    }
+}
