@@ -2,8 +2,9 @@ import { useFormik } from 'formik';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import PasswordShow from '../../../assets/images/password-show.svg';
 import PasswordHide from '../../../assets/images/password-hide.svg'
-import { useState } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import AuthService from "../../../services/auth.service";
+import AuthContext from '../../../context/AuthProvider';
 
 const validate = values => {
   const errors = {};
@@ -24,10 +25,13 @@ const validate = values => {
 export function Login() {
 
   let navigate = useNavigate();
-
+  const userRef = useRef();
+  const errRef = useRef();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
+
+  const { setAuth } = useContext(AuthContext);
 
   const formik = useFormik({
     initialValues: { username: '', password: '' },
@@ -35,11 +39,12 @@ export function Login() {
     onSubmit: (values) => {
       const { username, password } = values;
       setLoading(true);
-  
       AuthService.login(username, password).then(
-        () => {
+        (response) => {
+        console.log(response.data)
+        const accessToken = response?.data?.access;
+        setAuth({ username, accessToken });  
         navigate("/home");
-        window.location.reload();
       },
       error => {
         const resMessage =
@@ -55,7 +60,7 @@ export function Login() {
         // });
       }
       );
-    },
+     },
   });
 
   return (
@@ -65,6 +70,7 @@ export function Login() {
           HVSS
         </div>
         <div className="white-box">
+          <p ref={errRef} className='' aria-live='assertive'>{errMsg}</p>
           <h1 className="secondary-title mb-5">Login</h1>
         
           <form onSubmit={formik.handleSubmit}>
@@ -77,6 +83,7 @@ export function Login() {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.username}
+                ref={userRef}
               />
               {formik.errors.username && formik.touched.username && <div className="error-message">{formik.errors.username}</div>}
             </div>

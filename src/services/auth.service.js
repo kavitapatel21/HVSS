@@ -11,7 +11,11 @@ class AuthService {
                 localStorage.setItem("user", JSON.stringify(response.data));
             }
             return response.data;
+        },
+        error => { 
+            return error.response.data; 
         })
+        
     }
 
     logout(){
