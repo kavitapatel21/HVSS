@@ -4,6 +4,7 @@
 
 .search-data{
     max-width: 1100px;
+
     .table-wrapper{
         padding: 40px 20px;
     }
@@ -15,6 +16,7 @@
     }
     table{
         border: 1px solid var(--border);
+        min-width: 600px;
         tr{
             td{
                 padding: 19px 15px;

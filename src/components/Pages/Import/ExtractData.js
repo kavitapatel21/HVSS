@@ -6,8 +6,7 @@ import IcoSearch from "../../../assets/images/search_ico.svg";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 // import { useDrag, useDrop } from "react-dnd"; 
-
- 
+import { Table } from "react-bootstrap";
 
 const ExtractedData = () => {    
     return (
@@ -25,7 +24,7 @@ const ExtractedData = () => {
                                 <input type="text" placeholder="Search" id="search" name="search" />
                             </div>
                         </div>
-                        <table>
+                        <Table responsive>
                             <thead>
                                 <tr>
                                     <th>Code Position</th>
@@ -65,7 +64,7 @@ const ExtractedData = () => {
                                     </tr>  
                                 </DndProvider>
                             </tbody>
-                        </table>
+                        </Table>
                     </div> 
             </div>
         </div>

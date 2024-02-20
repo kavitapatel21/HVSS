@@ -129,7 +129,7 @@ button{
 
 
 .page-wrapper{
-    max-width: calc(100% - 236px);
+    max-width: calc(100% - 300px);
     width: 100%;
     text-align: left;
 }
@@ -157,6 +157,10 @@ button{
     table {
         width: 100%;
         border-top: 1px solid var(--border);
+        min-width: 700px;
+        margin-bottom: 0px;
+        background-color: #ffffff;
+        border-radius: 8px;
         tr{
             &:last-child td{
                 border-bottom: none;
@@ -170,10 +174,12 @@ button{
             line-height: 22px;
             color: var(--black);
             font-weight: 400; 
+            vertical-align: middle;
         }
         td{
             border-right: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
+            background-color: transparent;
             &:last-child{
                 border-right: none;
                 padding: 8px 15px;

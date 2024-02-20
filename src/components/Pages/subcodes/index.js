@@ -6,6 +6,7 @@ import Addrule from "../../../assets/images/add-rule.svg";
 import IcoMore from "../../../assets/images/more.svg";
 import IcoSearch from "../../../assets/images/search_ico.svg";
 import { Dropdown } from "react-bootstrap";
+import {Table} from "react-bootstrap";
 
 const Subcodes = () => {
     return (
@@ -23,7 +24,7 @@ const Subcodes = () => {
                             <input type="text" placeholder="Search" id="search" name="search" />
                         </div>
                     </div>
-                    <table>
+                    <Table responsive>
                         <thead>
                             <tr>
                                 <th>Code Position</th>
@@ -75,7 +76,7 @@ const Subcodes = () => {
                                 </td>
                             </tr> 
                         </tbody>
-                    </table>
+                    </Table>
                 </div> 
                 <div className="new-addition mt-4">
                     <a href="" className="new-record d-flex align-items-center">

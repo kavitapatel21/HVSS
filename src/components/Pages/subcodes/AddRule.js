@@ -20,38 +20,40 @@ const AddRules = () => {
                 <h2 className="page-title mb-4">New Rule</h2> 
                 <hr className="top-divider"/>
                 <div className="rule-list mt-4">
-                  <div className="d-md-flex align-items-center new-rule mb-3 flex-wrap">
-                    <span className="rule-no me-0 me-md-3 mb-3">1</span> 
-                    <div className="select-rules me-0 me-md-3 mb-3">
-                      <div className="position-relative c-pointer">
-                        <img src={DownArrow} className="ico_float right" alt="Down" />
-                        <select name="select-rues" id="select_rules">
-                          <option disabled>Select</option>
-                          <option>Compatible</option>
-                          <option>Incompatible</option>
-                        </select>
+                  <div className="d-flex align-items-start new-rule mb-3">
+                    <span className="rule-no me-3 mb-3 mt-2">1</span> 
+                    <div className="d-flex align-items-center flex-wrap w-100">
+                      <div className="select-rules me-3 mb-3">
+                        <div className="position-relative c-pointer">
+                          <img src={DownArrow} className="ico_float right" alt="Down" />
+                          <select name="select-rues" id="select_rules">
+                            <option disabled>Select</option>
+                            <option>Compatible</option>
+                            <option>Incompatible</option>
+                          </select>
+                        </div>
                       </div>
-                    </div>
-                    <div className="regular-title me-0 me-md-3 mb-3">
-                      When code at position
-                    </div>
-                    <div className="confition-input me-0 me-md-3 mb-3">
-                      <input type="text" name="add-contiion" id="add_condition" placeholder="0" />
-                    </div>
-                    <div className="select-rules me-0 me-md-3 mb-3">
-                      <div className="position-relative c-pointer">
-                        <img src={DownArrow} className="ico_float right" alt="Down" />
-                        <select name="select-rues" id="select_rules">
-                          <option disabled>Select</option>
-                          <option>In</option>
-                          <option>Not In</option>
-                          <option>Equals</option>
-                          <option>No Equals</option>
-                        </select>
+                      <div className="regular-title me-3 mb-3">
+                        When code at position
                       </div>
-                    </div>
-                    <div className="set-conition mb-3">
-                      <input type="text" name="set-contiion" id="set_condition" placeholder="MT" />
+                      <div className="confition-input me-3 mb-3">
+                        <input type="text" name="add-contiion" id="add_condition" placeholder="0" />
+                      </div>
+                      <div className="select-rules me-3 mb-3">
+                        <div className="position-relative c-pointer">
+                          <img src={DownArrow} className="ico_float right" alt="Down" />
+                          <select name="select-rues" id="select_rules">
+                            <option disabled>Select</option>
+                            <option>In</option>
+                            <option>Not In</option>
+                            <option>Equals</option>
+                            <option>No Equals</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="set-conition mb-3">
+                        <input type="text" name="set-contiion" id="set_condition" placeholder="MT" />
+                      </div>
                     </div>
                   </div>
                 </div>
