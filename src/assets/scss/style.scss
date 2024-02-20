@@ -223,7 +223,6 @@ button{
 .dropdown-toggle{
     display: flex !important;
     align-items: center;
-    margin-left: auto;
     &::after{
         border: none !important;
         background-image: url('../images/dropdown-arrow.svg') !important;
@@ -234,6 +233,7 @@ button{
         margin-left: 10px !important;
     } 
 }
+
 .error-message{
     color: red; 
     text-align: left;
@@ -264,4 +264,44 @@ button{
     .common-layout {
         padding: 34px 16px 20px 16px;
     }
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination li {
+    display: inline-block;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .pagination li.active {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .pagination li:hover {
+    background-color: #f5f5f5;
+  }
+
+.edit-subcode{
+    .dropdown-toggle {
+        background-color: var(--primary) !important;
+        border: 1px solid var(--primary) !important;
+    }
+}
+
+.dropdown-item.active {
+    background-color: var(--primary) !important;
+    border: 1px solid var(--primary) !important;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
 }

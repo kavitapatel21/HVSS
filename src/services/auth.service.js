@@ -1,30 +1,24 @@
 import API from '../services/api';
 
-class AuthService {
-    login(username, password) {
-        return API.post("login", {
-            username,
-            password
-        })
-        .then(response => {
-            if (response.data.accessToken) {
-                localStorage.setItem("user", JSON.stringify(response.data));
-            }
-            return response.data;
-        },
-        error => { 
-            return error.response.data; 
-        })
-        
-    }
-
-    logout(){
-        localStorage.removeItem("user");
-    }
-
-    getCurrentUser() {
-        return JSON.parse(localStorage.getItem("user"));
-    }
+export const login = (data) => {
+    return API.post("login", data)
+    .then(response => {
+        return response;
+    },
+    error => {
+        return error; 
+    })
 }
 
-export default new AuthService();
+export const checkLogin = (token) => {
+    const data = {
+        'refresh_token' : token
+    };
+    return API.post("refresh-token", data)
+    .then(response => {
+        return response;
+    },
+    error => {
+        return error; 
+    })
+}

@@ -6,6 +6,7 @@ import Subcodes from "../../assets/images/code.svg";
 import CloseSidebar from "../../assets/images/close.svg";
 
 const Sidebar = () => {
+  const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
     return (
       <div className="side-menu"> 
         <div className="text-end px-3 mb-5 d-block d-lg-none">
@@ -27,6 +28,12 @@ const Sidebar = () => {
                 <img src={Subcodes} width={18} height={18} className="me-4" alt="Sidebar" />
                 <span>Subcodes</span>
             </Link>
+            {authUser && authUser.user.role == 'admin' && (
+            <Link to="/users" className="logo text-white d-flex align-items-center jusfify-content-start">
+                <img src={Search} width={18} height={18} className="me-4" alt="Sidebar" />
+                <span>Users</span>
+            </Link>
+            )}
         </div>
       </div>
     );

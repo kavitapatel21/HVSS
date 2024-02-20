@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import PasswordShow from '../../../assets/images/password-show.svg';
 import PasswordHide from '../../../assets/images/password-hide.svg';
 import { useState } from 'react';
-import AuthService from "../../../services/auth.service";
+import { login } from "../../../services/auth.service";
 
 
 const validationSchema = Yup.object({
@@ -27,25 +27,25 @@ export function Register() {
       const { firstname, lastname, email, password } = values;
       setLoading(true);
   
-      AuthService.register(firstname, lastname, email, password).then(
-        () => {
-        this.props.router.navigate("/");
-        window.location.reload();
-      },
-      error => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
+      // AuthService.register(firstname, lastname, email, password).then(
+      //   () => {
+      //   this.props.router.navigate("/");
+      //   window.location.reload();
+      // },
+      // error => {
+      //   const resMessage =
+      //     (error.response &&
+      //       error.response.data &&
+      //       error.response.data.message) ||
+      //     error.message ||
+      //     error.toString();
   
-        // this.setState({
-        //   loading: false,
-        //   message: resMessage
-        // });
-      }
-      );
+      //   // this.setState({
+      //   //   loading: false,
+      //   //   message: resMessage
+      //   // });
+      // }
+      // );
     },
   });  
 

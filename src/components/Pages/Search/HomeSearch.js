@@ -2,11 +2,32 @@ import Header from "../../../components/Layout/Header"
 import Sidebar from "../../../components/Layout/Sidebar"
 import "../../../assets/scss/search.scss";
 import IcoSearch from "../../../assets/images/search_ico.svg"
-// import IcoMore from "../../../assets/images/more.svg"
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { getCodeDetailsAsync, codedetails, codeError } from "../../../features/homeSearchSlice";
 
 const HomeSearch = () => {
+    const dispatch = useDispatch();
+    const details = useSelector(codedetails);
+    const error = useSelector(codeError);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        if (searchQuery != '') {
+            dispatch(getCodeDetailsAsync(searchQuery));
+        }
+    }, [dispatch, searchQuery]);
+
+    const handleSearch = (event) => {
+        const query = event.target.value;
+        console.log(query);
+        setSearchQuery(query);
+    };
+
+    const alldetails = Object.entries(details ?? {}).map(([key, value]) => ({ key, value }));
+
     return (
-      <div className="d-flex">  
+    <div className="d-flex">  
         <Sidebar />
         <div className="page-wrapper search">         
             <Header />
@@ -17,7 +38,7 @@ const HomeSearch = () => {
                         <div className="table-search px-0">
                             <div className="position-relative">
                                 <img src={IcoSearch} className="ico_float left" alt="Search Here" />
-                                <input type="text" placeholder="Search" id="search" name="search" />
+                                <input type="text" placeholder="Search" id="search" name="search" value={searchQuery} onChange={handleSearch} />
                             </div>
                         </div>
                         <table className="mt-4">
@@ -28,64 +49,28 @@ const HomeSearch = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                            {alldetails.length === 0 || searchQuery == '' ?  (
+                                    <tr>
+                                    <td colSpan="2">No data found</td>
+                                    </tr>
+                            ) : (
+                            alldetails && alldetails.length > 0 && alldetails.map((detail, i) => {
+                            return (
+                                <tr key={i}>
                                     <td>
-                                        4
+                                        {detail.key}
                                     </td>
-                                    <td>4-way version</td> 
+                                    <td>{detail.value}</td> 
                                 </tr> 
-                                <tr>
-                                    <td>
-                                        WEH
-                                    </td>
-                                    <td>Electro-hydraulic</td> 
-                                </tr> 
-                                <tr>
-                                    <td>
-                                    7X
-                                    </td>
-                                    <td>Component series 70…79 (70…79: unchanged installation and connection
-                                        dimensions) – NG16 (from series 72) and NG25 ("W.H 22")
-                                    </td> 
-                                </tr> 
+                            )})
+                            )}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                {/* <div className="table-wrapper">
-                    <div className="table-search">
-                        <div className="position-relative">
-                            <img src={IcoSearch} className="ico_float left" alt="Search Here" />
-                            <input type="text" placeholder="Search" id="search" name="search" />
-                        </div>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>PDF</th>
-                                <th>Position</th>
-                                <th>Code</th>
-                                <th>Description</th>
-                                <th style={{width: "40px"}}></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <input type="text" name="pdf" id="pdf" placeholder="PDF" />
-                                </td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td className="text-center" style={{width: "40px"}}><img src={IcoMore} alt="More" /></td>
-                            </tr> 
-                        </tbody>
-                    </table>
-                </div> */}  
             </div>
         </div>
-      </div>
+    </div>
     );
   };
 export default HomeSearch;

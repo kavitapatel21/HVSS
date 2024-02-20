@@ -1,10 +1,11 @@
 import { useFormik } from 'formik';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PasswordShow from '../../../assets/images/password-show.svg';
 import PasswordHide from '../../../assets/images/password-hide.svg'
-import { useState, useRef, useEffect, useContext } from 'react';
-import AuthService from "../../../services/auth.service";
-import AuthContext from '../../../context/AuthProvider';
+import { useState, useRef, useEffect  } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { loginAsync, selectStatus, getError, selectIsLoggedIn } from "../../../features/loginSlice";
+import { toast } from 'react-toastify';
 
 const validate = values => {
   const errors = {};
@@ -14,53 +15,31 @@ const validate = values => {
 
   if (!values.password) {
     errors.password = 'Password is Required';
-  } 
-  // else if (values.password.length < 8) {
-  //   errors.password = 'Password must be at least 8 characters';
-  // }
+  }
 
   return errors;
 }
 
 export function Login() {
-
+  const isLoggedIn = useSelector(selectIsLoggedIn);
   let navigate = useNavigate();
-  const userRef = useRef();
-  const errRef = useRef();
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errMsg, setErrMsg] = useState('');
+  const dispatch = useDispatch();
+  const status = useSelector(selectStatus);
+  const errorMessage = useSelector(getError);
 
-  const { setAuth } = useContext(AuthContext);
+  useEffect(() => {
+    if (isLoggedIn && status == 'succeeded') {
+      navigate("/home"); // Redirect to home after successful login
+    } else if(status == 'failed') {
+      toast.error(errorMessage);
+    }
+  }, [isLoggedIn, status, navigate, errorMessage]);
 
   const formik = useFormik({
     initialValues: { username: '', password: '' },
     validate,
-    onSubmit: (values) => {
-      const { username, password } = values;
-      setLoading(true);
-      AuthService.login(username, password).then(
-        (response) => {
-        console.log(response.data)
-        const accessToken = response?.data?.access;
-        setAuth({ username, accessToken });  
-        navigate("/home");
-      },
-      error => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-  
-        // this.setState({
-        //   loading: false,
-        //   message: resMessage
-        // });
-      }
-      );
-     },
+    onSubmit: values => { dispatch(loginAsync(values)); },
   });
 
   return (
@@ -70,9 +49,7 @@ export function Login() {
           HVSS
         </div>
         <div className="white-box">
-          <p ref={errRef} className='' aria-live='assertive'>{errMsg}</p>
           <h1 className="secondary-title mb-5">Login</h1>
-        
           <form onSubmit={formik.handleSubmit}>
             <div className='form-group mb-4'>
               <label htmlFor="username" className='label-title mb-2 d-block w-100 text-left'>Username</label>
@@ -83,7 +60,6 @@ export function Login() {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.username}
-                ref={userRef}
               />
               {formik.errors.username && formik.touched.username && <div className="error-message">{formik.errors.username}</div>}
             </div>
@@ -126,7 +102,6 @@ export function Login() {
               <span className='regular-title c-pointer'>New user? <Link to="/register" className='highlight'>Create account</Link></span>
             </div>
           </form>
-
         </div>
       </div>
     </div>
