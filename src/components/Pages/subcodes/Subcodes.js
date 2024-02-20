@@ -111,12 +111,20 @@ const Subcodes = () => {
         <div className="page-wrapper">         
             <Header />
             <div className="common-layout">
-                <h2 className="page-title mb-4">Subcodes</h2>  
+                <div className="d-md-flex align-items-center justify-content-between mb-4">
+                    <h2 className="page-title mb-md-0 mb-3">Subcodes</h2>
+                    <div className="new-addition">
+                        <a href="#" onClick={addSubcode} className="new-record d-flex align-items-center">
+                            <img src={Addrule} width={18} height={18} className="me-3" alt="Add Record" />
+                            Add record
+                        </a>
+                    </div>  
+                </div>
                 <div className="table-wrapper">
-                    <div className="table-search">
-                        <div className="dropdown-filter">
+                    <div className="table-search d-md-flex align-items-center justify-content-between">
+                        <div className="dropdown-filter d-md-flex align-items-center">
                             <Dropdown align="start"  onSelect={handleVendorClick}>
-                                <Dropdown.Toggle id="dropdown-basic">
+                                <Dropdown.Toggle id="dropdown-basic" className="outline-button me-0 me-md-2">
                                     {selectedVendor ?
                                     getAllVendors.find(vendor => vendor.id == selectedVendor).username
                                     : 'Select Vendor'
@@ -131,7 +139,7 @@ const Subcodes = () => {
                                 </Dropdown.Menu>
                             </Dropdown>
                             <Dropdown align="start"  onSelect={handleDocClick}>
-                                <Dropdown.Toggle id="dropdown-basic">
+                                <Dropdown.Toggle id="dropdown-basic" className="outline-button">
                                     {selectedDoc ?
                                     getAllDocs.find(document => document.id == selectedDoc).name
                                     : 'Select Document'
@@ -146,9 +154,27 @@ const Subcodes = () => {
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
-                        <div className="position-relative">
-                            <img src={IcoSearch} className="ico_float left" alt="Search Here" />
-                            <input type="text" placeholder="Search" id="search" name="search" value={searchQuery} onChange={handleSearch} />
+                        <div className="d-md-flex align-items-center">
+                            <div className="position-relative me-0 me-md-2">
+                                <img src={IcoSearch} className="ico_float left" alt="Search Here" />
+                                <input type="text" placeholder="Search" id="search" name="search" value={searchQuery} onChange={handleSearch} />
+                            </div>
+                            <Dropdown align="start"  onSelect={handleDocClick}>
+                                <Dropdown.Toggle id="dropdown-basic" className="outline-button">
+                                    5
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu> 
+                                    <Dropdown.Item>
+                                        10
+                                    </Dropdown.Item> 
+                                    <Dropdown.Item>
+                                        50
+                                    </Dropdown.Item> 
+                                    <Dropdown.Item>
+                                        100
+                                    </Dropdown.Item> 
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
                     </div>
                     <table>
@@ -209,12 +235,6 @@ const Subcodes = () => {
                         <Modal.Body><AddSubcode onClose={closeAddPopup} vendors={getAllVendors} documents={getAllDocs}/> </Modal.Body>
                     </Modal>
                     )}
-                </div>
-                <div className="new-addition mt-4">
-                    <a href="#" onClick={addSubcode} className="new-record d-flex align-items-center">
-                        <img src={Addrule} width={18} height={18} className="me-3" alt="Add Record" />
-                        Add record
-                    </a>
                 </div>
                 <ReactPaginate
                     pageCount={totalPage}

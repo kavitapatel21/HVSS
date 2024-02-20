@@ -51,7 +51,7 @@ const HomeSearch = () => {
                             <tbody>
                             {alldetails.length === 0 || searchQuery == '' ?  (
                                     <tr>
-                                    <td colSpan="2">No data found</td>
+                                    <td colSpan="2" className="text-center">No data found</td>
                                     </tr>
                             ) : (
                             alldetails && alldetails.length > 0 && alldetails.map((detail, i) => {
