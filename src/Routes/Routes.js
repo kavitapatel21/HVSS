@@ -1,13 +1,13 @@
-// import Login from "../components/Login";
-// import Register from "../components/Register"; 
 import Import from "../components/Pages/Import/index"; 
 import AddColumnRules from "../components/Pages/Import/AddColumnRules"; 
 import ExtractedData from "../components/Pages/Import/ExtractData"; 
-import Subcodes from "../components/Pages/subcodes/index"; 
+import Subcodes from "../components/Pages/subcodes/subcodes"; 
 import AddRules from "../components/Pages/subcodes/AddRule"; 
 import Login from "../components/Pages/Login/Login";
 import Register from "../components/Pages/Login/Register";
 import HomeSearch from "../components/Pages/HomeSearch"; 
+import { Login } from "../components/Pages/Auth/Login";
+import { Register } from "../components/Pages/Auth/Register";
 
 const routesData = [
   {
@@ -21,7 +21,7 @@ const routesData = [
     title: "register"
   },
   {
-    path: "/",
+    path: "/home",
     element: <HomeSearch />,
     title: "home"
   },
