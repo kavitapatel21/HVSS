@@ -3,7 +3,7 @@
     --white: #ffffff;
     --black: #121212;
     --hover: #1497c2;
-    --border: #E6E6EB;
+    --border: #cccccc;
   }
 *{
     box-sizing: border-box;
@@ -349,12 +349,23 @@ button{
     }}
 }
 .table-wrapper{
+    &.extract{
+        border: none;
+        .table-search{
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0; 
+        }
+    }
     .extract-table{
         table{
+            border: 1px solid var(--border);
+            border-radius: 0 0 8px 8px; 
             tr{
                 &:last-child{
                     td{
                         border-bottom: 1px solid var(--border);
+                        border-radius: 0 0 8px 8px; 
                     }
                 }
             }

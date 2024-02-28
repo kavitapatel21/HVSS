@@ -37,8 +37,7 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
             className="c-pointer"
             alt="Cancel" 
           />
-        </span>
-        
+        </span>        
       </div>
     </div>    
   );
