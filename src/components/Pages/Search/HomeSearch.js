@@ -5,16 +5,20 @@ import IcoSearch from "../../../assets/images/search_ico.svg"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { getCodeDetailsAsync, codedetails, codeError } from "../../../features/homeSearchSlice";
+import Loader from "../../loader";
 
 const HomeSearch = () => {
     const dispatch = useDispatch();
     const details = useSelector(codedetails);
     const error = useSelector(codeError);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (searchQuery != '') {
-            dispatch(getCodeDetailsAsync(searchQuery));
+            setIsLoading(true);
+            dispatch(getCodeDetailsAsync(searchQuery))
+                .finally(() => setIsLoading(false));
         }
     }, [dispatch, searchQuery]);
 
@@ -49,20 +53,21 @@ const HomeSearch = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                            {alldetails.length === 0 || searchQuery == '' ?  (
-                                    <tr>
-                                    <td colSpan="2" className="text-center">No data found</td>
-                                    </tr>
+                            {isLoading ? (
+                                <Loader />
                             ) : (
-                            alldetails && alldetails.length > 0 && alldetails.map((detail, i) => {
-                            return (
-                                <tr key={i}>
-                                    <td>
-                                        {detail.key}
-                                    </td>
-                                    <td>{detail.value}</td> 
-                                </tr> 
-                            )})
+                                (alldetails.length === 0 || searchQuery === '') ? (
+                                    <tr>
+                                        <td colSpan="2" className="text-center">No data found</td>
+                                    </tr>
+                                ) : (
+                                    alldetails.map((detail, i) => (
+                                        <tr key={i}>
+                                            <td>{detail.key}</td>
+                                            <td>{detail.value}</td> 
+                                        </tr>
+                                    ))
+                                )
                             )}
                             </tbody>
                         </table>
