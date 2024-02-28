@@ -13,11 +13,20 @@ const initialState = {
 
 export const listUsersAsync = createAsyncThunk(
     'user/list',
-    async (rejectWithValue) => {
+    async (arg, { dispatch, rejectWithValue }) => {
         try {
             const response = await getAllUsers();
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await getAllUsers();
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
             } else {
                 return rejectWithValue(response);
             }

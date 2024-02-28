@@ -18,7 +18,7 @@ export const uploadDocument = (file) => {
 
 export const extractData = (doc_id) => {
     const auth = JSON.parse(localStorage.getItem('user'));
-    return API.get("document/63/extract_tables", {
+    return API.get("document/"+ doc_id + "/extract_tables", {
         headers:{
             'Authorization': `Bearer ${auth.access}`,
         }
@@ -31,17 +31,17 @@ export const extractData = (doc_id) => {
     })
 }
 
-export const formatData = (data) => {
+export const getformatData = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
+    const requestData = {
+        selected_table_data: data,
+    };
     const config = {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
-        params: {
-            selected_table_data: data,
-        },
     };
-    return API.post("format_table_with_gpt", config)
+    return API.post("format_table_with_gpt", requestData, config)
     .then(response => { 
         return response; 
     },

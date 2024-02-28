@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { checkLoginAsync } from "../features/loginSlice";
-import { uploadDocument, extractData, formatData } from "../services/document.service";
+import { uploadDocument, extractData, getformatData } from "../services/document.service";
 
 const initialState = {
     status: null,
@@ -63,14 +63,14 @@ export const formatDataAsync = createAsyncThunk(
     'document/formatdata',
     async (data, { dispatch, rejectWithValue }) => {
         try {
-            const response = await formatData(data);
+            const response = await getformatData(data);
             if (response.status === 200) {
                 return response.data; 
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await formatData(data);
+                    const check = await getformatData(data);
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
@@ -107,10 +107,16 @@ export const importFileSlice = createSlice({
                 state.status = 'succeeded';
                 state.extractedData = action.payload.data;
             })
+            .addCase(formatDataAsync.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                console.log(action.payload.data);
+                state.formatedData = action.payload.data;
+            })
     },
 });
 
 export const documentData = (state) => state.extractedData.documentData;
 export const extractedData = (state) => state.extractedData.extractedData;
 export const extractedStatus = (state) => state.extractedData.status;
+export const formatedData = (state) => state.extractedData.formatedData;
 export default importFileSlice.reducer;

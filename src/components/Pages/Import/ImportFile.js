@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadDocumentAsync, documentData, getExtractDataAsync, extractedData, extractedStatus } from "../../../features/importFileSlice";
 import { useNavigate } from 'react-router-dom';
-import Loader from "../../loader";
+import SubLoader from "../../inner_loader";
 
 const ImportFile = () => {
     const dispatch = useDispatch();
@@ -17,33 +17,36 @@ const ImportFile = () => {
     const docData = useSelector(documentData);
     const tableData = useSelector(extractedData);
     const extractStatus = useSelector(extractedStatus);
+    const [isLoading, setIsLoading] = useState(false);
     
     const handleFileChange = (event) => {
+        setIsLoading(true);
         const selectedFile = event.target.files[0];
         setSelectedFileName(selectedFile.name);
         let formData = new FormData();
 
         formData.append("file", selectedFile);
-        dispatch(uploadDocumentAsync(formData));
+        dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
     };
 
     useEffect(() => {
         if (docData) {
             setExtractData(true);
-            
         }
-    }, [docData, extractData]);
+        if (tableData) {
+            navigate('/extract', { state: {data: tableData} });
+        }
+    }, [docData, extractData, tableData]);
 
-    const getextractData = () => {
+    const getextractData = async () => {
+        setIsLoading(true)
         if (extractStatus) {
-            dispatch(getExtractDataAsync(docData.id));
-        }
-        navigate('/extract', { state: {data: tableData} });
+            await dispatch(getExtractDataAsync(docData.id)).finally(() => setIsLoading(false));
+        }   
     }
     
     return (
         <div className="d-flex">
-            {/* <Loader /> */}
             <Sidebar />
             <div className="page-wrapper search">
                 <Header />
@@ -55,11 +58,14 @@ const ImportFile = () => {
                                 <div className="input-box">
                                     <div className="file-information">
                                         <img src={Upload} alt="Upload" />
-                                        {selectedFileName ? (
+                                        {isLoading ? (
+                                            <SubLoader />
+                                        ) : (
+                                        (selectedFileName) ? (
                                             <p>{selectedFileName}</p>
                                         ) : (
                                             <p></p>
-                                        )}
+                                        ))}
                                         <p className="regular-title">
                                             Drop file here or <span className="highlight position-relative c-pointer">
                                                 <input type="file" name="file" id="file_upload" accept=".pdf" onChange={handleFileChange} />browse</span>

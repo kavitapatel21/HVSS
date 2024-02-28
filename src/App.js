@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 import Import from './components/Pages/Import/ImportFile';
 import Extract from './components/Pages/Import/ExtractData';
+import Format from './components/Pages/Import/FormatData';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/import" element={<Import />} />
             <Route path="/extract" element={<Extract />} />
+            <Route path="/format" element={<Format />} />
           </Route>
         </Routes> 
       </div>

@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import EditSubcode from "../../Pages/subcodes/EditSubcode";
 import { Modal } from "react-bootstrap";
 import AddSubcode from "./AddSubcode";
+import Loader from "../../loader";
 
 const Subcodes = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -29,6 +30,7 @@ const Subcodes = () => {
     const errorMessage = useSelector(getError);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const handleSearch = (event) => {
         const query = event.target.value;
         setSearchQuery(query);
@@ -54,7 +56,7 @@ const Subcodes = () => {
             const pages = Math.ceil(getcount / perPage);
             setTotalPages(pages);
         }
-    }, [dispatch, currentPage, errorMessage, status, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount]);
+    }, [dispatch, currentPage, errorMessage, status, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount]);
 
     const getAllVendors = useSelector(allVendors);
     const getAllDocs = useSelector(allDocuments);
@@ -200,7 +202,10 @@ const Subcodes = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {subcodes && subcodes.length === 0 ?  (
+                        {isLoading ? (
+                            <Loader />
+                        ) : 
+                        (subcodes && subcodes.length === 0) ?  (
                             <tr>
                             <td colSpan="6" className="text-center">No data found</td>
                             </tr>
