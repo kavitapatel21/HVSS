@@ -69,9 +69,9 @@ const ImportFile = () => {
                             </div>
                         </div>
                     </form>
-                    <div>
+                    <div className="text-end mt-4">
                         { extractData && (
-                            <button onClick={getextractData} className="primary-button">Extract Data</button>
+                            <button onClick={getextractData} className="primary-button ms-auto">Extract Data</button>
                         )}
                     </div>
                 </div>

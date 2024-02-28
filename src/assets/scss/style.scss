@@ -334,3 +334,17 @@ button{
     margin-top: -24px; /* Adjust as needed to align with the top of the table */
     margin-right: -24px; /* Adjust as needed to align with the right side of the table */
 }
+
+.offcanvas-backdrop{
+    z-index: 9999 !important;
+}
+.offcanvas{
+    z-index: 99999 !important;
+    .table-wrapper{ table{
+        border-top: none;
+        min-width: 100%;
+        td{
+            padding: 7px 10px !important;
+        }
+    }}
+}

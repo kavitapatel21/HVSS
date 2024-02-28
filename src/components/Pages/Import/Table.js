@@ -55,7 +55,8 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
         </Offcanvas.Header>
         <Offcanvas.Body>
           {selectedTables.map((tableData, index) => (
-            <div key={index}>
+            <>
+            <div className="table-wrapper" key={index}>
               <table>
                 <tbody>
                   {tableData.map((row, rowIndex) => (
@@ -66,10 +67,12 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-              <hr />
+              </table> 
             </div>
+            <div className='top-divider my-3'></div>
+            </>
           ))}
+ 
         </Offcanvas.Body>
       </Offcanvas>
     </div>
