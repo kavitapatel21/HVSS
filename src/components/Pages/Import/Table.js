@@ -13,7 +13,7 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
   };
   
   return (
-    <div className="table-container" style={{ marginBottom: '20px' }}>
+    <div className="table-container extract-table">
       <table>
         <tbody>
           {tableData.map((row, rowIndex) => (
@@ -25,16 +25,20 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
           ))}
         </tbody>
       </table>
-      <div className="button-container">
-        <button onClick={handleSelect}>Select</button>
-        <img
-          src={CancelRecord}
-          width={24}
-          height={24}
-          className="c-pointer"
-          alt="Cancel"
-          onClick={handleCancel}
-        />
+      <div className="text-right d-flex my-3 mx-3">
+        <button className='outline-button ms-auto d-flex align-items-center' onClick={handleSelect}>
+          Select
+        </button> 
+        <span className='vertical-divider d-flex align-items-center justify-content-center' onClick={handleCancel}>
+          <img
+            src={CancelRecord}
+            width={24}
+            height={24}
+            className="c-pointer"
+            alt="Cancel" 
+          />
+        </span>
+        
       </div>
     </div>    
   );

@@ -5,7 +5,7 @@ import IcoSearch from "../../../assets/images/search_ico.svg"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { getCodeDetailsAsync, codedetails, codeError } from "../../../features/homeSearchSlice";
-import Loader from "../../loader";
+import SubLoader from "../../inner_loader";
 
 const HomeSearch = () => {
     const dispatch = useDispatch();
@@ -33,7 +33,7 @@ const HomeSearch = () => {
     return (
     <div className="d-flex">  
         <Sidebar />
-        <div className="page-wrapper search">         
+        <div className="page-wrapper search position-relative">         
             <Header />
             <div className="common-layout">
                 <h2 className="page-title mb-4">Search</h2> 
@@ -54,7 +54,7 @@ const HomeSearch = () => {
                             </thead>
                             <tbody>
                             {isLoading ? (
-                                <Loader />
+                                <SubLoader />
                             ) : (
                                 (alldetails.length === 0 || searchQuery === '') ? (
                                     <tr>

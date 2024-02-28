@@ -348,3 +348,25 @@ button{
         }
     }}
 }
+.table-wrapper{
+    .extract-table{
+        table{
+            tr{
+                &:last-child{
+                    td{
+                        border-bottom: 1px solid var(--border);
+                    }
+                }
+            }
+        }
+        .outline-button{
+            padding: 10px 30px 10px 30px !important;
+        }
+    }
+}
+.vertical-divider{
+    border: 1px solid var(--border);
+    display: flex; 
+    padding: 5px 10px;
+    border-left: 0px;
+}

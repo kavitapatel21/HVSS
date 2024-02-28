@@ -78,8 +78,7 @@ const ExtractData = () => {
                                 <img src={IcoSearch} className="ico_float left" alt="Search Here" />
                                 <input type="text" placeholder="Search" id="search" name="search" />
                             </div>
-                        </div>
-                        
+                        </div> 
                         { remainingTables.map((tableData, index) => (
                         <div key={index}>
                             <TableComponent 
@@ -87,7 +86,7 @@ const ExtractData = () => {
                                 onSelect={() => handleTableSelect(tableData)}
                                 onCancel={() => handleTableCancel(index)}
                             />
-                            {index < data.length - 1 && <hr />}
+                            {index < data.length - 1 && <div className="m-0"></div>}
                         </div>
                         ))}
                     </div> 
@@ -100,28 +99,30 @@ const ExtractData = () => {
                     {selectedTables.length > 0 ? (
                     <>
                         {selectedTables.map((tableData, index) => (
-                        <div className="table-wrapper" key={index}>
-                            <table>
-                            <tbody>
-                                {tableData.map((row, rowIndex) => (
-                                <tr key={rowIndex}>
-                                    {row.map((cell, cellIndex) => (
-                                    <td key={cellIndex}>{cell}</td>
-                                    ))}
-                                </tr>
-                                ))}
-                            </tbody>
-                            </table>
-                            <hr />
-                        </div>
+                            <>
+                                <div className="table-wrapper" key={index}>
+                                    <table>
+                                    <tbody>
+                                        {tableData.map((row, rowIndex) => (
+                                        <tr key={rowIndex}>
+                                            {row.map((cell, cellIndex) => (
+                                            <td key={cellIndex}>{cell}</td>
+                                            ))}
+                                        </tr>
+                                        ))}
+                                    </tbody>
+                                    </table> 
+                                </div>
+                                <div className="top-divider my-3"></div>
+                            </>
                         ))}
-                        <button onClick={formatData()}>Format Data</button>
+                        <button className="primary-button w-100" onClick={formatData()}>Format Data</button>
                     </>
                     ) : (
-                    <p>No tables selected</p>
+                        <p className="regular-title">No tables selected</p>
                     )}
                 </Offcanvas.Body>
-                </Offcanvas>
+            </Offcanvas>
         </div>
       </div>
     );
