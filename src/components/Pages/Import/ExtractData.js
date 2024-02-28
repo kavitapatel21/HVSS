@@ -7,13 +7,16 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 // import { useDrag, useDrop } from "react-dnd"; 
 import { Table } from "react-bootstrap";
 import { useLocation } from 'react-router-dom';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableComponent from "./Table";
 import { useDispatch } from 'react-redux';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import Button from 'react-bootstrap/Button';
 
 const ExtractData = () => {
     const location = useLocation();
     const dispatch = useDispatch();
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
 
     // const { data } = location.state;
     // console.log(data)
@@ -25,6 +28,9 @@ const ExtractData = () => {
         ];
     console.log(data);
 
+    
+    
+
     const [tablesData, setTablesData] = useState(data);
     const [selectedTables, setSelectedTables] = useState([]);
     const [remainingTables, setRemainingTables] = useState(tablesData);
@@ -32,6 +38,12 @@ const ExtractData = () => {
     const handleTableSelect = (tableData) => {
         setSelectedTables([...selectedTables, tableData]);
     };
+
+    useEffect(() => {
+        if (selectedTables != '') {
+            setShowOffcanvas(true);
+        }
+    }, [selectedTables]);
 
     const handleTableCancel = (tableIndex) => {
         const updatedTables = [...remainingTables];
@@ -42,6 +54,14 @@ const ExtractData = () => {
     const formatData = () => {
         console.log(selectedTables);
         // dispatch(formatDataAsync(selectedTables));
+    }
+
+    const handleClose = () => {
+        setShowOffcanvas(false);
+    };
+
+    const handleFormat = () => {
+        
     }
 
     return (
@@ -70,13 +90,38 @@ const ExtractData = () => {
                             {index < data.length - 1 && <hr />}
                         </div>
                         ))}
-                        {selectedTables.length > 0 && (
-                            <div className="submit-button-container">
-                                <button onClick={formatData()}>Submit</button>
-                            </div>
-                        )}
                     </div> 
             </div>
+            <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Selected Tables</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    {selectedTables.length > 0 ? (
+                    <>
+                        {selectedTables.map((tableData, index) => (
+                        <div key={index}>
+                            <table>
+                            <tbody>
+                                {tableData.map((row, rowIndex) => (
+                                <tr key={rowIndex}>
+                                    {row.map((cell, cellIndex) => (
+                                    <td key={cellIndex}>{cell}</td>
+                                    ))}
+                                </tr>
+                                ))}
+                            </tbody>
+                            </table>
+                            <hr />
+                        </div>
+                        ))}
+                        <button onClick={formatData()}>Format Data</button>
+                    </>
+                    ) : (
+                    <p>No tables selected</p>
+                    )}
+                </Offcanvas.Body>
+                </Offcanvas>
         </div>
       </div>
     );
