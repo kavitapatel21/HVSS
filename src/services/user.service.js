@@ -7,7 +7,7 @@ export const getAllUsers = () => {
             'Authorization': `Bearer ${auth.access}`
         },
     };
-    return API.get("vendor", config)
+    return API.get("user", config)
         .then(response => { 
             return response; 
         },
@@ -19,7 +19,7 @@ export const getAllUsers = () => {
 export const addUser = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
 
-    return API.post("vendor", data, {
+    return API.post("user", data, {
         headers:{
             'Authorization': `Bearer ${auth.access}`
         }
@@ -34,7 +34,7 @@ export const addUser = (data) => {
 
 export const updateUser = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
-    return API.patch("vendor/"+ data.id , data, {
+    return API.patch("user/"+ data.id , data, {
         headers:{
             'Authorization': `Bearer ${auth.access}`
         }
@@ -47,14 +47,14 @@ export const updateUser = (data) => {
     })
 }
 
-export const deleteUser = (vendorId) => {
+export const deleteUser = (userId) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     const config = {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
     };
-    return API.delete("vendor/"+ vendorId, {
+    return API.delete("user/"+ userId, {
         headers:{
             'Authorization': `Bearer ${auth.access}`
         }

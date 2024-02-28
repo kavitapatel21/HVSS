@@ -1,23 +1,46 @@
+import React from "react";
 import Sidebar from "../../Layout/Sidebar";
 import Header from "../../Layout/Header";
-// import Loader from "../../Loader";
 import "../../../assets/scss/import.scss";
 import Upload from "../../../assets/images/Upload.svg"
-import { useState } from "react";
-// import IcoMore from "../../../assets/images/more.svg"
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadDocumentAsync, documentData, getExtractDataAsync, extractedData, extractedStatus } from "../../../features/importFileSlice";
+import { useNavigate } from 'react-router-dom';
+import Loader from "../../loader";
 
 const ImportFile = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [selectedFileName, setSelectedFileName] = useState('');
-
+    const [extractData, setExtractData] = useState(false);
+    const docData = useSelector(documentData);
+    const tableData = useSelector(extractedData);
+    const extractStatus = useSelector(extractedStatus);
+    
     const handleFileChange = (event) => {
-        const fileInput = event.target;
-        if (fileInput.files.length > 0) {
-            setSelectedFileName(fileInput.files[0].name);
-        } else {
-            setSelectedFileName('');
-        }
+        const selectedFile = event.target.files[0];
+        setSelectedFileName(selectedFile.name);
+        let formData = new FormData();
+
+        formData.append("file", selectedFile);
+        dispatch(uploadDocumentAsync(formData));
     };
 
+    useEffect(() => {
+        if (docData) {
+            setExtractData(true);
+            
+        }
+    }, [docData, extractData]);
+
+    const getextractData = () => {
+        if (extractStatus) {
+            dispatch(getExtractDataAsync(docData.id));
+        }
+        navigate('/extract', { state: {data: tableData} });
+    }
+    
     return (
         <div className="d-flex">
             {/* <Loader /> */}
@@ -26,55 +49,31 @@ const ImportFile = () => {
                 <Header />
                 <div className="common-layout">
                     <h2 className="page-title mb-4">Import a File</h2>
-                    <div className="custom-file-upload">
-                        <div className="file-upload-box">
-                            <div className="input-box">
-                                <input type="file" name="file-upload" id="file_upload" />
-                                <div className="file-information">
-                                    <img src={Upload} alt="Upload" />
-                                    {selectedFileName ? (
-                                        <p>{selectedFileName}</p>
-                                    ) : (
-                                        <p></p>
-                                    )}
-                                    <p className="regular-title">
-                                        Drop file here or <span className="highlight position-relative c-pointer">
-                                            <input type="file" name="file-upload" id="file_upload" accept=".pdf" onChange={handleFileChange} />browse</span>
-                                    </p>
+                    <form>
+                        <div className="custom-file-upload">
+                            <div className="file-upload-box">
+                                <div className="input-box">
+                                    <div className="file-information">
+                                        <img src={Upload} alt="Upload" />
+                                        {selectedFileName ? (
+                                            <p>{selectedFileName}</p>
+                                        ) : (
+                                            <p></p>
+                                        )}
+                                        <p className="regular-title">
+                                            Drop file here or <span className="highlight position-relative c-pointer">
+                                                <input type="file" name="file" id="file_upload" accept=".pdf" onChange={handleFileChange} />browse</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </form>
+                    <div>
+                        { extractData && (
+                            <button onClick={getextractData} className="primary-button">Extract Data</button>
+                        )}
                     </div>
-                    {/* <div className="table-wrapper">
-                    <div className="table-search">
-                        <div className="position-relative">
-                            <img src={IcoSearch} className="ico_float left" alt="Search Here" />
-                            <input type="text" placeholder="Search" id="search" name="search" />
-                        </div>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>PDF</th>
-                                <th>Position</th>
-                                <th>Code</th>
-                                <th>Description</th>
-                                <th style={{width: "40px"}}></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <input type="text" name="pdf" id="pdf" placeholder="PDF" />
-                                </td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td><input type="text" name="pdf" id="pdf" placeholder="PDF" /></td>
-                                <td className="text-center" style={{width: "40px"}}><img src={IcoMore} alt="More" /></td>
-                            </tr> 
-                        </tbody>
-                    </table>
-                </div>  */}
                 </div>
             </div>
         </div>

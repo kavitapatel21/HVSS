@@ -322,3 +322,15 @@ button{
 .modal-backdrop,.modal {
     z-index: 9999 !important;
 }
+
+.table-container {
+    position: relative;
+}
+
+.cancel-button-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: -24px; /* Adjust as needed to align with the top of the table */
+    margin-right: -24px; /* Adjust as needed to align with the right side of the table */
+}

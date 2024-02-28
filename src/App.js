@@ -13,7 +13,8 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import Import from './components/Pages/Import/index';
+import Import from './components/Pages/Import/ImportFile';
+import Extract from './components/Pages/Import/ExtractData';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path="/add-rules" element={<AddRules />} />
             <Route path="/users" element={<Users />} />
             <Route path="/import" element={<Import />} />
+            <Route path="/extract" element={<Extract />} />
           </Route>
         </Routes> 
       </div>

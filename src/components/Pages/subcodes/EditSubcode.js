@@ -82,14 +82,14 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
               <label htmlFor="vendor_id" className='label-title mb-2 d-block w-100 text-left'>Vendor</label>
               <Dropdown align="start">
                 <Dropdown.Toggle id="dropdown-basic">
-                    {formik.values.vendor_id.username}
+                    {formik.values.vendor_id.name}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     {vendors && vendors.map(vendor => (
                     <Dropdown.Item key={vendor.id} href='#' 
                         active={vendor.id == formik.values.vendor_id.id} 
                         onClick={() => handleVendorClick(vendor.id)}>
-                        {vendor.username}
+                        {vendor.name}
                     </Dropdown.Item>
                     ))}
                 </Dropdown.Menu>

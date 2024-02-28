@@ -27,8 +27,6 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
     onSubmit: async (values) => {
       try {
         await dispatch(addSubCodeAsync(values));
-        
-        // After the action is completed, call onClose to close the popup
         onClose(); // Close the popup after submission
       } catch (error) {
         console.error('An error occurred:', error);
@@ -82,14 +80,14 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
               <label htmlFor="vendor_id" className='label-title mb-2 d-block w-100 text-left'>Vendor</label>
               <Dropdown align="start">
                 <Dropdown.Toggle id="dropdown-basic">
-                    {formik.values.vendor_id.username}
+                    {formik.values.vendor_id.name}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     {vendors && vendors.map(vendor => (
                     <Dropdown.Item key={vendor.id} href='#' 
                         active={vendor.id == formik.values.vendor_id.id} 
                         onClick={() => handleVendorClick(vendor.id)}>
-                        {vendor.username}
+                        {vendor.name}
                     </Dropdown.Item>
                     ))}
                 </Dropdown.Menu>

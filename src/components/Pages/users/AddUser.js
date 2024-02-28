@@ -79,7 +79,7 @@ const AddUser = ({ onClose }) => {
               <input 
               type="text"
               name="first_name"
-              placeholder="Code"
+              placeholder="First Name"
               value={formik.values.first_name}
               onChange={formik.handleChange}
               />

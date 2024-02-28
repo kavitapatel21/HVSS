@@ -1,5 +1,5 @@
 import API from '../services/api';
-export const getAllSubCodes = (page, search, doc_id) => {
+export const getAllSubCodes = (page, search, vendor_id, doc_id, per_page) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     const config = {
         headers: {
@@ -8,11 +8,18 @@ export const getAllSubCodes = (page, search, doc_id) => {
         params: {
             page: page,
             search: search,
-            page_size: 10
         },
     };
-    if (doc_id) {
+    if (doc_id && doc_id != 0) {
         config.params.document_id = doc_id;
+    }
+    if (vendor_id && vendor_id != 0) {
+        config.params.vendor_id = vendor_id;
+    }
+    if (per_page) {
+        config.params.page_size = per_page;
+    } else {
+        config.params.page_size = 10;
     }
     return API.get("product_subcodes", config)
         .then(response => { 

@@ -4,6 +4,7 @@ import Search from "../../assets/images/search.svg";
 import Export from "../../assets/images/Export.svg";
 import Subcodes from "../../assets/images/code.svg";
 import CloseSidebar from "../../assets/images/close.svg";
+import { NavLink } from 'react-router-dom';
 
 const Sidebar = () => {
   const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -12,27 +13,27 @@ const Sidebar = () => {
         <div className="text-end px-3 mb-5 d-block d-lg-none">
           <img src={CloseSidebar} className="ms-auto" width={32} height={32} alt="Close-sidebar" />
         </div>  
-        <Link className="logo text-white">
+        <NavLink className="logo text-white">
             <h4 className="primary-title px-2">HVSS</h4>
-        </Link>
+        </NavLink>
         <div className="hvss-menu">
-            <Link to="/" className="logo text-white d-flex align-items-center jusfify-content-start active">
+            <NavLink to="/home" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
                 <img src={Search} className="me-4" alt="Sidebar" />
                 <span>Search</span>
-            </Link>
-            <Link to="/import" className="logo text-white d-flex align-items-center jusfify-content-start">
+            </NavLink>
+            <NavLink to="/import" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
                 <img src={Export} className="me-4" alt="Sidebar" />
                 <span>Import</span>
-            </Link>            
-            <Link to="/subcodes" className="logo text-white d-flex align-items-center jusfify-content-start">
+            </NavLink>            
+            <NavLink to="/subcodes" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
                 <img src={Subcodes} width={18} height={18} className="me-4" alt="Sidebar" />
                 <span>Subcodes</span>
-            </Link>
+            </NavLink>
             {authUser && authUser.user.role == 'admin' && (
-            <Link to="/users" className="logo text-white d-flex align-items-center jusfify-content-start">
+            <NavLink to="/users" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
                 <img src={Search} width={18} height={18} className="me-4" alt="Sidebar" />
                 <span>Users</span>
-            </Link>
+            </NavLink>
             )}
         </div>
       </div>

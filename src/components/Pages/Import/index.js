@@ -55,6 +55,42 @@ const Import = () => {
                         </tbody>
                     </table>
                 </div>  */}
+
+                {/* <Table responsive>
+                            <thead>
+                                <tr>
+                                    <th>Code Position</th>
+                                    <th style={{width: "40%"}}>Description</th>
+                                    <th>Code</th>
+                                    <th style={{width: "40px"}}></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {data && data.length === 0 ?  (
+                            <tr>
+                            <td colSpan="6" className="text-center">No data found</td>
+                            </tr>
+                            ) : (
+                            data && data.length > 0 && data.map((item, i) => {
+                            return (
+                                <tr>
+                                    {item[0] !== null && (
+                                    <>
+                                    {item.map((innerItem, innerIndex) => (
+                                        <td key={innerIndex}>
+                                            {innerItem}
+                                        </td>
+                                    ))}
+                                    <td className="text-center" style={{width: "40px"}}>   
+                                        <img src={CancelRecord} width={24} height={24} className="c-pointer" alt="Cancel" />
+                                    </td>
+                                    </>
+                                    )}
+                                </tr> 
+                            )})
+                            )}
+                            </tbody>
+                        </Table> */}
             </div>
         </div>
       </div>

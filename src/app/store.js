@@ -3,6 +3,7 @@ import loginReducer from "../features/loginSlice";
 import subcodeReducer from "../features/subcodeSlice";
 import codeReducer from "../features/homeSearchSlice";
 import userReducer from "../features/userSlice";
+import importReducer from "../features/importFileSlice";
 
 export default configureStore({
     reducer: {
@@ -10,5 +11,6 @@ export default configureStore({
         subcodes: subcodeReducer,
         codeDetails: codeReducer,
         users: userReducer,
+        extractedData: importReducer
     },
 });

@@ -7,7 +7,7 @@ import IcoSearch from "../../../assets/images/search_ico.svg";
 import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { selectSubcodes, listSubCodesAsync, selectCurrentPage, 
-    totalPages, setCurrentPage, selectStatus, getError, 
+    count, setCurrentPage, selectStatus, getError, 
     listVendorAsync, allVendors, listDocAsync, allDocuments,
     deleteSubCodeAsync } from "../../../features/subcodeSlice";
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +22,8 @@ const Subcodes = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
     const dispatch = useDispatch();
     let navigate = useNavigate();
-    const totalPage = useSelector(totalPages);
+    const getcount = useSelector(count);
+    const [totalPage, setTotalPages] = useState(0);
     const currentPage = useSelector(selectCurrentPage);
     const status = useSelector(selectStatus);
     const errorMessage = useSelector(getError);
@@ -33,14 +34,15 @@ const Subcodes = () => {
         setSearchQuery(query);
     };
     const [perPage, setPerPage] = useState(10);
+    const perPageOptions = [5, 10, 20, 50, 100];
     const [offset, setOffset] = useState(0);
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
-    const [selectedVendor, setSelectedVendor] = useState(null);
-    const [selectedDoc, setSelectedDoc] = useState(null);
+    const [selectedVendor, setSelectedVendor] = useState(0);
+    const [selectedDoc, setSelectedDoc] = useState(0);
 
     useEffect(() => {
         if (!isAddPopupOpen || !isPopupOpen) {
-            dispatch(listSubCodesAsync({currentPage, searchQuery}));
+            dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
             if(status == 'failed') {
                 toast.error(errorMessage);
                 navigate('/login');
@@ -49,8 +51,10 @@ const Subcodes = () => {
                 dispatch(listVendorAsync());
             }
             dispatch(listDocAsync());
+            const pages = Math.ceil(getcount / perPage);
+            setTotalPages(pages);
         }
-    }, [dispatch, currentPage, errorMessage, status, isPopupOpen, searchQuery]);
+    }, [dispatch, currentPage, errorMessage, status, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount]);
 
     const getAllVendors = useSelector(allVendors);
     const getAllDocs = useSelector(allDocuments);
@@ -59,7 +63,7 @@ const Subcodes = () => {
     const handlePageChange = ({ selected }) => {
         dispatch(setCurrentPage(selected + 1));
         const currentPage = selected + 1;
-        dispatch(listSubCodesAsync({currentPage, searchQuery}));
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
         setOffset(selected * perPage);
     };
 
@@ -94,15 +98,18 @@ const Subcodes = () => {
         setIsAddPopupOpen(false);
     };
 
-    const handleVendorClick = (eventKey, event) => {
+    const handleVendorClick = (eventKey) => {
         setSelectedVendor(eventKey);
-
     };
-    const handleDocClick = (eventKey, event) => {
+    const handleDocClick = (eventKey) => {
         setSelectedDoc(eventKey);
-        const doc_id = eventKey;
-        dispatch(listSubCodesAsync({currentPage, searchQuery, doc_id}));
     };
+
+    const handlePerPage = (eventKey) => {
+        setPerPage(eventKey);
+        const perPage = eventKey;
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
+    }
     
     return (
       <div className="d-flex">  
@@ -125,29 +132,35 @@ const Subcodes = () => {
                         <div className="dropdown-filter d-md-flex align-items-center">
                             <Dropdown align="start"  onSelect={handleVendorClick}>
                                 <Dropdown.Toggle id="dropdown-basic" className="outline-button me-0 me-md-2">
-                                    {selectedVendor ?
-                                    getAllVendors.find(vendor => vendor.id == selectedVendor).username
+                                    {selectedVendor && selectedVendor != 0 ?
+                                    getAllVendors.find(vendor => vendor.id == selectedVendor).name
                                     : 'Select Vendor'
                                     }
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
+                                    <Dropdown.Item key="0" eventKey="0" active={selectedVendor == 0}>
+                                        Select Vendor
+                                    </Dropdown.Item>
                                     {getAllVendors && getAllVendors.map(vendor => (
-                                    <Dropdown.Item key={vendor.id} eventKey={vendor.id}>
-                                        {vendor.username}
+                                    <Dropdown.Item key={vendor.id} eventKey={vendor.id} active={selectedVendor == vendor.id}>
+                                        {vendor.name}
                                     </Dropdown.Item>
                                     ))}
                                 </Dropdown.Menu>
                             </Dropdown>
                             <Dropdown align="start"  onSelect={handleDocClick}>
                                 <Dropdown.Toggle id="dropdown-basic" className="outline-button">
-                                    {selectedDoc ?
+                                    {selectedDoc && selectedDoc != 0 ?
                                     getAllDocs.find(document => document.id == selectedDoc).name
                                     : 'Select Document'
                                     }
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
+                                    <Dropdown.Item key="0" eventKey="0" active={selectedDoc == 0}>
+                                        Select Document
+                                    </Dropdown.Item>
                                     {getAllDocs && getAllDocs.map(document => (
-                                    <Dropdown.Item key={document.id} eventKey={document.id}>
+                                    <Dropdown.Item key={document.id} eventKey={document.id} active={selectedDoc == document.id}>
                                         {document.name}
                                     </Dropdown.Item>
                                     ))}
@@ -159,20 +172,17 @@ const Subcodes = () => {
                                 <img src={IcoSearch} className="ico_float left" alt="Search Here" />
                                 <input type="text" placeholder="Search" id="search" name="search" value={searchQuery} onChange={handleSearch} />
                             </div>
-                            <Dropdown align="start"  onSelect={handleDocClick}>
+                            <Dropdown align="start"  onSelect={handlePerPage}>
                                 <Dropdown.Toggle id="dropdown-basic" className="outline-button">
-                                    5
+                                    {perPage}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu> 
-                                    <Dropdown.Item>
-                                        10
+                                {perPageOptions.map((option, index) => (
+                                    <Dropdown.Item  eventKey={option} 
+                                        active={option == perPage} >    
+                                        {option}
                                     </Dropdown.Item> 
-                                    <Dropdown.Item>
-                                        50
-                                    </Dropdown.Item> 
-                                    <Dropdown.Item>
-                                        100
-                                    </Dropdown.Item> 
+                                ))}
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
@@ -185,14 +195,17 @@ const Subcodes = () => {
                                 <th>Description</th>
                                 <th>Code</th>
                                 <th>PDF Name</th>
-                                {authUser && authUser.user.role == 'admin' && (
                                 <th>Vendor</th>
-                                )}
                                 <th style={{width: "40px"}}></th>
                             </tr>
                         </thead>
                         <tbody>
-                        {subcodes && subcodes.length > 0 && subcodes.map((subcode, i) => {
+                        {subcodes && subcodes.length === 0 ?  (
+                            <tr>
+                            <td colSpan="6" className="text-center">No data found</td>
+                            </tr>
+                        ) : (
+                        subcodes && subcodes.length > 0 && subcodes.map((subcode, i) => {
                             return (
                             <tr key={i}>
                                 <td className="text-center">{renderSerialNumber(i)}</td>
@@ -202,9 +215,7 @@ const Subcodes = () => {
                                 <td><input type="text" name="description" id="description" placeholder="PDF" value={subcode.description} /></td>
                                 <td><input type="text" name="code" id="code" value={subcode.code} /></td>
                                 <td><input type="text" name="doc" id="doc" value={subcode.document_id.name}/></td>
-                                {authUser && authUser.user.role == 'admin' && 
-                                (<td><input type="text" name="vendor_id" id="vendor_id" value={subcode.vendor_id.username}/></td>
-                                )}
+                                <td><input type="text" name="vendor_id" id="vendor_id" value={subcode.vendor_id ? subcode.vendor_id.name : 'N/A'}/></td>
                                 <td className="text-center" style={{width: "40px"}}>
                                     <Dropdown>
                                         <Dropdown.Toggle className="transparent-button" id="dropdown-basic">
@@ -218,9 +229,8 @@ const Subcodes = () => {
                                     </Dropdown>
                                 </td>
                             </tr>
-                        )
-                        })
-                        } 
+                        )})
+                        )}
                         </tbody>
                     </table>
                     {isPopupOpen && (

@@ -13,22 +13,24 @@ const initialState = {
     currentPage: 1,
     error: null,
     vendors: null,
-    documents: null
+    documents: null,
+    perPage: null
 };
 
 export const listSubCodesAsync = createAsyncThunk(
     'subcodes/list',
     async (data, { dispatch, rejectWithValue }) => {
         try {
-            const {currentPage, searchQuery, doc_id} = data;
-            const response = await getAllSubCodes(currentPage, searchQuery, doc_id);
+            const {currentPage, searchQuery, selectedVendor, selectedDoc, perPage} = data;
+            const response = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage);
+            console.log(response);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await getAllSubCodes(currentPage, searchQuery, doc_id);
+                    const check = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage);
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
@@ -200,4 +202,5 @@ export const getError = (state) => state.subcodes.error;
 export const selectStatus = (state) => state.subcodes.status;
 export const allVendors = (state) => state.subcodes.vendors;
 export const allDocuments = (state) => state.subcodes.documents;
+export const count = (state) => state.subcodes.count;
 export default subcodeSlice.reducer;
