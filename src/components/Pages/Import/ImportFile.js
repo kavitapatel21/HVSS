@@ -57,7 +57,7 @@ const ImportFile = () => {
                             <div className="file-upload-box">
                                 <div className="input-box">
                                     <div className="file-information">
-                                        <img src={Upload} alt="Upload" />
+                                        <img src={Upload} alt="Upload" /> 
                                         {isLoading ? (
                                             <SubLoader />
                                         ) : (
