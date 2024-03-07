@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL: `https://461806feac3f45de02c66636878d9098.serveo.net/api/v1/`,
+    baseURL: `http://54.218.129.223/api/v1/`,
 });

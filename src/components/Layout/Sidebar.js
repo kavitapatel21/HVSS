@@ -30,11 +30,19 @@ const Sidebar = () => {
                 <span>Subcodes</span>
             </NavLink>
             {authUser && authUser.user.role == 'admin' && (
+            <>
             <NavLink to="/users" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
                 <img src={Search} width={18} height={18} className="me-4" alt="Sidebar" />
                 <span>Users</span>
             </NavLink>
+
+            <NavLink to="/vendors" activeClassName="active" className="logo text-white d-flex align-items-center jusfify-content-start">
+            <img src={Search} width={18} height={18} className="me-4" alt="Sidebar" />
+            <span>Vendors</span>
+            </NavLink>
+            </>
             )}
+            
         </div>
       </div>
     );

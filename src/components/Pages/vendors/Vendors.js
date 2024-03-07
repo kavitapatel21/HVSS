@@ -3,17 +3,17 @@ import Sidebar from "../../Layout/Sidebar"
 import IcoSearch from "../../../assets/images/search_ico.svg"
 import IcoMore from "../../../assets/images/more.svg";
 import { useEffect, useState } from "react";
-import { listUsersAsync, selectUsers, deleteUserAsync } from "../../../features/userSlice";
+import { listVendorsAsync, selectVendors, deleteVendorAsync } from "../../../features/vendorSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
-import AddUser from "./AddUser";
-import EditUser from "./EditUser";
+import AddVendor from "./AddVendor";
+import EditVendor from "./EditVendor";
 import Table from 'react-bootstrap/Table';
 
-const Users = () => {
+const Vendors = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
     const dispatch = useDispatch();
     let navigate = useNavigate();
@@ -23,11 +23,11 @@ const Users = () => {
 
     useEffect(() => {
         if (!isAddPopupOpen || !isEditPopupOpen) {
-            dispatch(listUsersAsync());
+            dispatch(listVendorsAsync());
         }
     }, [dispatch, isAddPopupOpen, isEditPopupOpen]);
 
-    const users = useSelector(selectUsers);
+    const vendors = useSelector(selectVendors);
 
     const [editedRow, setEditedRow] = useState(null);
     const handleEditPopup = (row) => {
@@ -41,13 +41,14 @@ const Users = () => {
     const closeAddPopup = () => {
         setIsAddPopupOpen(false);
     };
-    const addUser = () => {
+    const addVendor = () => {
         setIsAddPopupOpen(true);
     };
     
-    const handleDeleteUser = async (user) => {
-        await dispatch(deleteUserAsync(user));
-        toast.success('User deleted Successfully!')
+    const handleDeleteVendor = async (vendor) => {
+        await dispatch(deleteVendorAsync(vendor));
+        dispatch(listVendorsAsync());
+        toast.success('Vendor deleted Successfully !')
     }
 
     return (
@@ -57,37 +58,35 @@ const Users = () => {
         <div className="page-wrapper">         
             <Header />
             <div className="common-layout">
-                <h2 className="page-title mb-4">Users</h2>  
+                <h2 className="page-title mb-4">Vendors</h2>  
                 <div className="table-wrapper">
                     <div className="table-search">
                         <div className="position-relative">
-                            <button className='primary-button ms-auto' onClick={addUser}>Add User</button>
+                            <button className='primary-button ms-auto' onClick={addVendor}>Add Vendor</button>
                         </div>
                     </div>
                     <Table striped>
                         <thead>
                             <tr>
                                 <th>Sr No.</th>
-                                <th>User Name</th>
-                                <th>Email</th>
+                                <th>Name</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                        {users && users.length > 0 && users.map((user, i) => {
+                        {vendors && vendors.length > 0 && vendors.map((vendor, i) => {
                             return (
                             <tr key={i}>
                                 <td>{i+1}</td>
-                                <td>{user.username}</td>
-                                <td>{user.email}</td>
+                                <td>{vendor.name}</td>
                                 <td>
                                     <Dropdown>
                                         <Dropdown.Toggle className="transparent-button" id="dropdown-basic">
                                             <img src={IcoMore} alt="More" />
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item href="#" onClick={() => handleEditPopup(user)}>Edit</Dropdown.Item> 
-                                            <Dropdown.Item href="#" onClick={() => handleDeleteUser(user.id)}>Delete</Dropdown.Item> 
+                                            <Dropdown.Item href="#" onClick={() => handleEditPopup(vendor)}>Edit</Dropdown.Item> 
+                                            <Dropdown.Item href="#" onClick={() => handleDeleteVendor(vendor.id)}>Delete</Dropdown.Item> 
                                         </Dropdown.Menu>
                                     </Dropdown>
                                 </td>
@@ -99,14 +98,14 @@ const Users = () => {
                     </Table>
                     {isAddPopupOpen && (
                     <Modal backdrop="static" size="md" show={isAddPopupOpen} onHide={() => setIsAddPopupOpen(false)}>
-                        <Modal.Header closeButton> Add User </Modal.Header>
-                        <Modal.Body><AddUser onClose={closeAddPopup} /> </Modal.Body>
+                        <Modal.Header closeButton> Add Vendor </Modal.Header>
+                        <Modal.Body><AddVendor onClose={closeAddPopup} /> </Modal.Body>
                     </Modal>
                     )}
                     {isEditPopupOpen && (
                     <Modal backdrop="static" size="md" show={isEditPopupOpen} onHide={() => setIsEditPopupOpen(false)}>
-                        <Modal.Header closeButton> Edit User </Modal.Header>
-                        <Modal.Body><EditUser rowData={editedRow} onClose={closeEditPopup}/> </Modal.Body>
+                        <Modal.Header closeButton> Edit Vendor </Modal.Header>
+                        <Modal.Body><EditVendor rowData={editedRow} onClose={closeEditPopup}/> </Modal.Body>
                     </Modal>
                 )}
                 </div>
@@ -115,4 +114,4 @@ const Users = () => {
       </div>
     );
   };
-export default Users;
+export default Vendors;

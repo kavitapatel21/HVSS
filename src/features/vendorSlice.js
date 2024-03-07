@@ -1,26 +1,28 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { checkLoginAsync } from "../features/loginSlice";
-import { uploadDocument, extractData, getformatData } from "../services/document.service";
+
+import { getAllVendors, addVendor, updateVendor, deleteVendor } from "../services/vendor.service";
+import { checkLoginAsync } from "./loginSlice";
 
 const initialState = {
     status: null,
     message: null,
+    count: 0,
     error: null,
-    documentData: null,
+    vendors: null
 };
 
-export const uploadDocumentAsync = createAsyncThunk(
-    'document/upload',
-    async (file, { dispatch, rejectWithValue }) => {
+export const listVendorsAsync = createAsyncThunk(
+    'vendor/list',
+    async (arg, { dispatch, rejectWithValue }) => {
         try {
-            const response = await uploadDocument(file);
+            const response = await getAllVendors();
             if (response.status === 200) {
-                return response.data; 
+                return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await uploadDocument(file);
+                    const check = await getAllVendors();
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
@@ -34,43 +36,18 @@ export const uploadDocumentAsync = createAsyncThunk(
     }
 );
 
-export const getExtractDataAsync = createAsyncThunk(
-    'document/extract',
-    async (doc_id, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await extractData(doc_id);
-            if (response.status === 200) {
-                return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await extractData(doc_id);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
-            } else {
-                return rejectWithValue(response);
-            }
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
-
-export const formatDataAsync = createAsyncThunk(
-    'document/formatdata',
+export const addVendorAsync = createAsyncThunk(
+    'vendor/add',
     async (data, { dispatch, rejectWithValue }) => {
         try {
-            const response = await getformatData(data);
+            const response = await addVendor(data);
             if (response.status === 200) {
-                return response.data; 
+                return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await getformatData(data);
+                    const check = await addVendor(data);
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
@@ -84,19 +61,55 @@ export const formatDataAsync = createAsyncThunk(
     }
 );
 
-export const importFileSlice = createSlice({
-    name: 'extractedData',
+export const updateVendorAsync = createAsyncThunk(
+    'user/update',
+    async (data, { dispatch, rejectWithValue }) => {
+        try {
+            const response = await updateVendor(data);
+            if (response.status === 200) {
+                return response.data; 
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await updateVendor(data);
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
+            } else {
+                return rejectWithValue(response);
+            }
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+export const deleteVendorAsync = createAsyncThunk(
+    'vendor/delete',
+    async (vendorId, { rejectWithValue }) => {
+        try {
+            const response = await deleteVendor(vendorId);
+            if (response.status === 200) {
+                return response.data; // If successful, return the response data
+            } else {
+                return rejectWithValue(response);
+            }
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+export const vendorSlice = createSlice({
+    name: 'users',
     initialState,
-    reducers: {
-        clearData: (state, action) => {
-            state.formatedData = null;
-            state.extractData = null;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(uploadDocumentAsync.pending, (state) => { })
-            .addCase(uploadDocumentAsync.rejected, (state, action) => {
+            .addCase(listVendorsAsync.pending, (state) => { })
+            .addCase(listVendorsAsync.rejected, (state, action) => {
                 state.status = 'failed';
                 if (action.payload) {
                     state.error = action.payload.message;
@@ -104,25 +117,13 @@ export const importFileSlice = createSlice({
                     state.error = action.error.message; // Fallback to action.error.message if payload is not available
                 }
             })
-            .addCase(uploadDocumentAsync.fulfilled, (state, action) => {
+            .addCase(listVendorsAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.documentData = action.payload.data;
-            })
-            .addCase(getExtractDataAsync.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.extractedData = action.payload.data;
-            })
-            .addCase(formatDataAsync.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                console.log(action.payload.data);
-                state.formatedData = action.payload.data;
+                state.vendors = action.payload.data.results;
             })
     },
 });
 
-export const { clearData } = importFileSlice.actions;
-export const documentData = (state) => state.extractedData.documentData;
-export const extractedData = (state) => state.extractedData.extractedData;
-export const extractedStatus = (state) => state.extractedData.status;
-export const formatedData = (state) => state.extractedData.formatedData;
-export default importFileSlice.reducer;
+
+export const selectVendors = (state) => state.vendors.vendors;
+export default vendorSlice.reducer;

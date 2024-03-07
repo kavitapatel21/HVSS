@@ -16,7 +16,8 @@ import {
 import Import from './components/Pages/Import/ImportFile';
 import Extract from './components/Pages/Import/ExtractData';
 import Format from './components/Pages/Import/FormatData';
-
+import Toast from './utils/toast';
+import Vendors from './components/Pages/vendors/Vendors';
 
 function App() {
   return (
@@ -34,8 +35,10 @@ function App() {
             <Route path="/import" element={<Import />} />
             <Route path="/extract" element={<Extract />} />
             <Route path="/format" element={<Format />} />
+            <Route path="/vendors" element={<Vendors />} />
           </Route>
-        </Routes> 
+        </Routes>
+        <Toast />
       </div>
     </Router>
   );

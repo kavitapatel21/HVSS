@@ -4,6 +4,7 @@ import subcodeReducer from "../features/subcodeSlice";
 import codeReducer from "../features/homeSearchSlice";
 import userReducer from "../features/userSlice";
 import importReducer from "../features/importFileSlice";
+import vendorReducer from "../features/vendorSlice";
 
 export default configureStore({
     reducer: {
@@ -11,6 +12,7 @@ export default configureStore({
         subcodes: subcodeReducer,
         codeDetails: codeReducer,
         users: userReducer,
-        extractedData: importReducer
+        extractedData: importReducer,
+        vendors: vendorReducer,
     },
 });

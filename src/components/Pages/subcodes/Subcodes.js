@@ -18,6 +18,7 @@ import EditSubcode from "../../Pages/subcodes/EditSubcode";
 import { Modal } from "react-bootstrap";
 import AddSubcode from "./AddSubcode";
 import Loader from "../../loader";
+import Table from 'react-bootstrap/Table';
 
 const Subcodes = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -84,8 +85,10 @@ const Subcodes = () => {
         console.log("Saved data:", editedData);
     };
 
-    const handleDeleteCode = (code) => {
-        dispatch(deleteSubCodeAsync(code));
+    const handleDeleteCode = async (code) => {
+        await dispatch(deleteSubCodeAsync(code));
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
+        toast.success('Subcode Deleted Successfully!');
     }
 
     const renderSerialNumber = (index) => {
@@ -189,16 +192,16 @@ const Subcodes = () => {
                             </Dropdown>
                         </div>
                     </div>
-                    <table>
+                    <Table striped>
                         <thead>
                             <tr>
-                                <th>Sr No.</th>
+                                {/* <th>Sr No.</th> */}
                                 <th>Code Position</th>
                                 <th>Description</th>
                                 <th>Code</th>
                                 <th>PDF Name</th>
                                 <th>Vendor</th>
-                                <th style={{width: "40px"}}></th>
+                                <th style={{width: "40px"}}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -213,18 +216,16 @@ const Subcodes = () => {
                         subcodes && subcodes.length > 0 && subcodes.map((subcode, i) => {
                             return (
                             <tr key={i}>
-                                <td className="text-center">{renderSerialNumber(i)}</td>
+                                <td className="d-none">{renderSerialNumber(i)}</td>
+                                <td>{subcode.code_position}</td>
+                                <td>{subcode.description}</td>
+                                <td>{subcode.code}</td>
+                                <td>{subcode.document_id.name}</td>
+                                <td>{subcode.vendor_id ? subcode.vendor_id.name : 'N/A'}</td>
                                 <td>
-                                    <input type="text" name="key" id="key" placeholder="PDF" value={subcode.code_position} />
-                                </td>
-                                <td><input type="text" name="description" id="description" placeholder="PDF" value={subcode.description} /></td>
-                                <td><input type="text" name="code" id="code" value={subcode.code} /></td>
-                                <td><input type="text" name="doc" id="doc" value={subcode.document_id.name}/></td>
-                                <td><input type="text" name="vendor_id" id="vendor_id" value={subcode.vendor_id ? subcode.vendor_id.name : 'N/A'}/></td>
-                                <td className="text-center" style={{width: "40px"}}>
                                     <Dropdown>
                                         <Dropdown.Toggle className="transparent-button" id="dropdown-basic">
-                                            <img src={IcoMore} alt="More" />
+                                            <img src={IcoMore} width={18} height={18} alt="More" />
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             <Dropdown.Item href="/add-rules">Add rule</Dropdown.Item> 
@@ -237,7 +238,7 @@ const Subcodes = () => {
                         )})
                         )}
                         </tbody>
-                    </table>
+                    </Table>
                     {isPopupOpen && (
                     <Modal backdrop="static" size="md" show={isPopupOpen} onHide={() => setIsPopupOpen(false)}>
                         <Modal.Header closeButton> Edit Subcode </Modal.Header>

@@ -8,6 +8,8 @@ export const loginAsync = createAsyncThunk(
             const response = await login(data);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
+            } else if(response.response.status === 401) {
+                return rejectWithValue(response.response.data.data.detail);
             } else {
                 return rejectWithValue(response);
             }
@@ -60,7 +62,7 @@ export const loginSlice = createSlice({
             .addCase(loginAsync.rejected, (state, action) => {
                 state.status = 'failed';
                 if (action.payload) {
-                    state.error = action.payload.message;
+                    state.error = action.payload ? action.payload : action.payload.message;
                 } else {
                     state.error = action.error.message; // Fallback to action.error.message if payload is not available
                 }

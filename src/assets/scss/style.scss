@@ -171,19 +171,19 @@ button{
                 border-bottom: none;
             }
         th{
-            background-color: #FAFAFC;
-            padding: 19px 15px;
+            // background-color: #FAFAFC;
+            // padding: 19px 15px;
         }
         th,td{
             font-size: 14px;
             line-height: 22px;
             color: var(--black);
-            font-weight: 400; 
+            // font-weight: 400; 
             vertical-align: middle;
         }
         td{
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            // border-right: 1px solid var(--border);
+            // border-bottom: 1px solid var(--border);
             background-color: transparent;
             &:last-child{
                 border-right: none;
@@ -380,4 +380,7 @@ button{
     display: flex; 
     padding: 5px 10px;
     border-left: 0px;
+}
+.offcanvas {
+    width: 40% !important;
 }

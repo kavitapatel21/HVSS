@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import { updateSubCodeAsync } from "../../../features/subcodeSlice";
 import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown } from "react-bootstrap";
+import { toast } from 'react-toastify';
 
 const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
   const dispatch = useDispatch();
@@ -27,19 +28,19 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
     onSubmit: async (values) => {
       try {
         await dispatch(updateSubCodeAsync(values));
-        
-        // After the action is completed, call onClose to close the popup
         onClose(); // Close the popup after submission
+        toast.success('Subcode updated Successfully!')
       } catch (error) {
+        toast.error(error)
         console.error('An error occurred:', error);
       }
     },
   });
   
   const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-  const handleVendorClick = (vendorId) => {
-    formik.setFieldValue('vendor_id', vendors.find(vendor => vendor.id === vendorId));
-  };
+  // const handleVendorClick = (vendorId) => {
+  //   formik.setFieldValue('vendor_id', vendors.find(vendor => vendor.id === vendorId));
+  // };
   const handleDocClick = (docId) => {
     formik.setFieldValue('document_id', documents.find(document => document.id === docId));
   };
@@ -77,7 +78,7 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
               onChange={formik.handleChange}
               />
             </div>
-            { authUser && authUser.user.role == 'admin' && (
+            {/* { authUser && authUser.user.role == 'admin' && (
               <div className='form-group mb-4'>
               <label htmlFor="vendor_id" className='label-title mb-2 d-block w-100 text-left'>Vendor</label>
               <Dropdown align="start">
@@ -95,7 +96,7 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            )}
+            )} */}
             <div className='form-group mb-4'>
               <label htmlFor="document_id" className='label-title mb-2 d-block w-100 text-left'>Document</label>
                 <Dropdown align="start">

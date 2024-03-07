@@ -23,7 +23,6 @@ export const listSubCodesAsync = createAsyncThunk(
         try {
             const {currentPage, searchQuery, selectedVendor, selectedDoc, perPage} = data;
             const response = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage);
-            console.log(response);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
@@ -112,11 +111,20 @@ export const deleteSubCodeAsync = createAsyncThunk(
 
 export const listVendorAsync = createAsyncThunk(
     'vendor/list',
-    async (rejectWithValue) => {
+    async (arg, { dispatch, rejectWithValue }) => {
         try {
             const response = await getAllVendors();
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await getAllVendors();
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
             } else {
                 return rejectWithValue(response);
             }
@@ -171,12 +179,8 @@ export const subcodeSlice = createSlice({
                 state.subcodes = action.payload.data.results;
                 const data = state.subcodes.map(item => ({
                     ...item,
-                    // Remove \u00a0 from each string property
-                    // Example: If 'name' is a property containing the \u00a0 character
                     description: item.description.replace(/\u00a0/g, ''),
-                    // Add more properties to remove \u00a0 as needed
                   }));
-                  console.log(data);
                 state.count = action.payload.data.count;
                 state.totalPages = Math.ceil(action.payload.data.count / 10);
             })

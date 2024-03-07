@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CancelRecord from "../../../assets/images/close-color.svg"
-
+import Table from 'react-bootstrap/Table';
 
 const TableComponent = ({ tableData, onCancel, onSelect }) => {
 
@@ -14,7 +14,7 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
   
   return (
     <div className="table-container extract-table">
-      <table>
+      <Table striped bordered>
         <tbody>
           {tableData.map((row, rowIndex) => (
             <tr key={rowIndex}>
@@ -24,7 +24,7 @@ const TableComponent = ({ tableData, onCancel, onSelect }) => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
       <div className="text-right d-flex my-3 mx-3">
         <button className='outline-button ms-auto d-flex align-items-center' onClick={handleSelect}>
           Select

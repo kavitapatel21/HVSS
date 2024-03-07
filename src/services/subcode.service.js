@@ -31,7 +31,6 @@ export const getAllSubCodes = (page, search, vendor_id, doc_id, per_page) => {
 }
 
 export const createSubCode = (data) => {
-    data.vendor_id = data.vendor_id.id;
     data.document_id = data.document_id.id;
     const auth = JSON.parse(localStorage.getItem('user'));
 
@@ -48,10 +47,26 @@ export const createSubCode = (data) => {
     })
 }
 
+export const createMultipleSubCode = (data) => {
+    const auth = JSON.parse(localStorage.getItem('user'));
+
+    return API.post("product_subcodes", data, {
+        headers:{
+            'Authorization': `Bearer ${auth.access}`
+        }
+    })
+    .then(response => { 
+        return response; 
+    },
+    error => { 
+        return error; 
+    })
+}
+
+
 
 export const updateSubCode = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
-    data.vendor_id = data.vendor_id.id;
     data.document_id = data.document_id.id;
     return API.patch("product_subcodes/"+ data.id , data, {
         headers:{

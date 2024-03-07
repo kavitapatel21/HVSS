@@ -4,10 +4,13 @@ import Header from "../../Layout/Header";
 import "../../../assets/scss/import.scss";
 import Upload from "../../../assets/images/Upload.svg"
 import { useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadDocumentAsync, documentData, getExtractDataAsync, extractedData, extractedStatus } from "../../../features/importFileSlice";
 import { useNavigate } from 'react-router-dom';
 import SubLoader from "../../inner_loader";
+import { listVendorAsync, allVendors } from "../../../features/subcodeSlice";
+import { toast } from 'react-toastify';
 
 const ImportFile = () => {
     const dispatch = useDispatch();
@@ -18,23 +21,36 @@ const ImportFile = () => {
     const tableData = useSelector(extractedData);
     const extractStatus = useSelector(extractedStatus);
     const [isLoading, setIsLoading] = useState(false);
+    const getAllVendors = useSelector(allVendors);
+    const [selectedVendor, setSelectedVendor] = useState(0);
+
+    const handleVendorClick = (eventKey) => {
+        setSelectedVendor(eventKey);
+    };
     
     const handleFileChange = (event) => {
-        setIsLoading(true);
-        const selectedFile = event.target.files[0];
-        setSelectedFileName(selectedFile.name);
-        let formData = new FormData();
+        if (selectedVendor != 0) {
+            setIsLoading(true);
+            const selectedFile = event.target.files[0];
+            setSelectedFileName(selectedFile.name);
+            let formData = new FormData();
 
-        formData.append("file", selectedFile);
-        dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
+            formData.append("file", selectedFile);
+            formData.append('vendor_id', selectedVendor);
+            dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
+        } else {
+            toast.error('Please Select the Vendor.')
+        }
+        
     };
 
     useEffect(() => {
+        dispatch(listVendorAsync());
         if (docData) {
             setExtractData(true);
         }
         if (tableData) {
-            navigate('/extract', { state: {data: tableData} });
+            navigate('/extract', { state: {data: tableData, document_id:docData.id } });
         }
     }, [docData, extractData, tableData]);
 
@@ -52,6 +68,26 @@ const ImportFile = () => {
                 <Header />
                 <div className="common-layout">
                     <h2 className="page-title mb-4">Import a File</h2>
+                    <div className="dropdown-filter d-md-flex justify-content-end w-100 mb-3">
+                            <Dropdown align="start"  onSelect={handleVendorClick}>
+                                <Dropdown.Toggle id="dropdown-basic" className="outline-button me-0 me-md-2">
+                                    {selectedVendor && selectedVendor != 0 ?
+                                    getAllVendors.find(vendor => vendor.id == selectedVendor).name
+                                    : 'Select Vendor'
+                                    }
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item key="0" eventKey="0" active={selectedVendor == 0}>
+                                        Select Vendor
+                                    </Dropdown.Item>
+                                    {getAllVendors && getAllVendors.map(vendor => (
+                                    <Dropdown.Item key={vendor.id} eventKey={vendor.id} active={selectedVendor == vendor.id}>
+                                        {vendor.name}
+                                    </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
                     <form>
                         <div className="custom-file-upload">
                             <div className="file-upload-box">

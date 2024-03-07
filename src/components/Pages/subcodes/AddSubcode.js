@@ -2,9 +2,12 @@ import { useFormik } from 'formik';
 import { addSubCodeAsync } from "../../../features/subcodeSlice";
 import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
 
 const AddSubcode = ({ onClose, vendors, documents }) => {
   const dispatch = useDispatch();
+  const [selectedDoc, setSelectedDoc] = useState(0);
   const validate = values => {
     const errors = {};
     if (!values.code_position && formik.touched.code_position) {
@@ -22,23 +25,26 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
   }
 
   const formik = useFormik({
-    initialValues: { code_position: '', description: '', code: '', vendor_id: '', document_id: '' },
+    initialValues: { code_position: '', description: '', code: '', document_id: '' },
     validate,
     onSubmit: async (values) => {
       try {
         await dispatch(addSubCodeAsync(values));
         onClose(); // Close the popup after submission
+        toast.success('Subcode Added Successfully !')
       } catch (error) {
+        toast.error(error);
         console.error('An error occurred:', error);
       }
     },
   });
   
   const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-  const handleVendorClick = (vendorId) => {
-    formik.setFieldValue('vendor_id', vendors.find(vendor => vendor.id === vendorId));
-  };
+  // const handleVendorClick = (vendorId) => {
+  //   formik.setFieldValue('vendor_id', vendors.find(vendor => vendor.id === vendorId));
+  // };
   const handleDocClick = (docId) => {
+    setSelectedDoc(docId)
     formik.setFieldValue('document_id', documents.find(document => document.id === docId));
   };
   return (
@@ -75,7 +81,7 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
               onChange={formik.handleChange}
               />
             </div>
-            { authUser && authUser.user.role == 'admin' && (
+            {/* { authUser && authUser.user.role == 'admin' && (
               <div className='form-group mb-4'>
               <label htmlFor="vendor_id" className='label-title mb-2 d-block w-100 text-left'>Vendor</label>
               <Dropdown align="start">
@@ -93,14 +99,20 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            )}
+            )} */}
             <div className='form-group mb-4'>
               <label htmlFor="document_id" className='label-title mb-2 d-block w-100 text-left'>Document</label>
                 <Dropdown align="start">
                   <Dropdown.Toggle id="dropdown-basic">
-                      {formik.values.document_id.name}
+                  {selectedDoc && selectedDoc != 0 ?
+                  documents.find(document => document.id == selectedDoc).name
+                  : 'Select Document'
+                  }
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
+                    <Dropdown.Item key="0" eventKey="0" active={selectedDoc == 0}>
+                      Select Document
+                    </Dropdown.Item>
                       {documents && documents.map(document => (
                       <Dropdown.Item key={document.id} href='#' 
                           active={document.name == formik.values.document_id.name} 
