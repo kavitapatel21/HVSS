@@ -16,3 +16,20 @@ export const getCodeDetails = (code) => {
             return error; 
         })
 }
+
+export const uploadExcel = (file) => {
+    const auth = JSON.parse(localStorage.getItem('user'));
+    console.log(file);
+    return API.post("download_excel", file, {
+        headers:{
+            'Authorization': `Bearer ${auth.access}`,
+            'Content-Type': 'multipart/form-data',
+        }
+    })
+    .then(response => { 
+        return response; 
+    },
+    error => { 
+        return error; 
+    })
+}

@@ -19,6 +19,7 @@ import { Modal } from "react-bootstrap";
 import AddSubcode from "./AddSubcode";
 import Loader from "../../loader";
 import Table from 'react-bootstrap/Table';
+import { showConfirmationDialog } from "../../../utils/SweetAlert";
 
 const Subcodes = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -85,11 +86,21 @@ const Subcodes = () => {
         console.log("Saved data:", editedData);
     };
 
-    const handleDeleteCode = async (code) => {
-        await dispatch(deleteSubCodeAsync(code));
-        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
-        toast.success('Subcode Deleted Successfully!');
-    }
+    const handleDeleteCode = (code) => {
+        showConfirmationDialog(
+          'Are you sure to delete this record?',
+          'You will not be able to recover this record!',
+          'warning',
+          'Yes, delete it!',
+          'No, cancel',
+          true,
+          async () => {
+            await dispatch(deleteSubCodeAsync(code));
+            dispatch(listSubCodesAsync({ currentPage, searchQuery, selectedVendor, selectedDoc, perPage }));
+            toast.success('Subcode Deleted Successfully!');
+        }
+        );
+    };
 
     const renderSerialNumber = (index) => {
         return index + offset + 1;

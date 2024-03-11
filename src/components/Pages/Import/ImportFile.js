@@ -38,10 +38,10 @@ const ImportFile = () => {
             formData.append("file", selectedFile);
             formData.append('vendor_id', selectedVendor);
             dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
+            event.target.value = '';
         } else {
             toast.error('Please Select the Vendor.')
         }
-        
     };
 
     useEffect(() => {

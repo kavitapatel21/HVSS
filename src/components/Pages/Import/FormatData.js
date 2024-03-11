@@ -12,100 +12,104 @@ import { createMultipleSubCode } from "../../../services/subcode.service";
 import { useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { clearData } from "../../../features/importFileSlice";
-
+import Swal from 'sweetalert2'
 
 const FormatData = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const initialValues = {
+    code_position: '',
+    description: '',
+    code: ''
+  }
+
+  const [data, setData] = useState([]);
+  const [document, setDocument] = useState(0);
   
-    const dispatch = useDispatch();
-    const initialValues = {
-      code_position: '',
-      description: '',
-      code: ''
-    }
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [editedRow, setEditedRow] = useState(initialValues);
+  const [rowIndex, setRowIndex] = useState(0);
 
-    const [data, setData] = useState([]);
-    const [document, setDocument] = useState(0);
-    
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [editedRow, setEditedRow] = useState(initialValues);
-    const [deletedRow, setDeletedRow] = useState(0);
-    const [rowIndex, setRowIndex] = useState(0);
-
-    const editRecord = (row) => {
-      setRowIndex(row);
-      setEditedRow(data[row]);
-      setIsPopupOpen(true);
-    }
-
-    const deleteRecord = (row) => {
-      setDeletedRow(row);
-    }
-
-    const closePopup = () => {
-      setIsPopupOpen(false);
+  const editRecord = (row) => {
+    setRowIndex(row);
+    setEditedRow(data[row]);
+    const values = {
+      code_position:data[row][0],
+      description: data[row][1],
+      code: data[row][2],
     };
 
-    const formik = useFormik({
-      initialValues: initialValues, // Use formValues if available, otherwise use initialValues
-      onSubmit: async (values) => {
-        try {
-          console.log(data);
-          if (rowIndex !== null) { // Check if rowIndex is not null
-            const updatedData = [...data];
-            if (rowIndex !== null && updatedData[rowIndex]) {
-              updatedData[rowIndex][0] = values.code_position;
-              updatedData[rowIndex][1] = values.description;
-              updatedData[rowIndex][2] = values.code;
-            }
-          }
-          setEditedRow(null);
-          setIsPopupOpen(false);
-        } catch (error) {
-          console.error('An error occurred:', error);
-        }
-      },
-    });
+    formik.setValues(values);
+    setIsPopupOpen(true);
+  }
 
-    useEffect(() => {
-      const { formattedData, docId } = location.state;
-      if (formattedData) {
-        setData(formattedData.data);
-      }
-    
-      if(docId) {
-        setDocument(docId)
-      }
-    
-      if (editedRow) {
-        const values = {
-          code_position: editedRow[0],
-          description: editedRow[1],
-          code: editedRow[2],
-        };
-        
-        formik.setValues(values);
-      }
-
-      if (deletedRow) {
-        const updatedData = data.filter((record, index) => index !== deletedRow);
+  const deleteRecord = (id) => {
+    Swal.fire({
+      title: 'Are you sure to remove this record?',
+      text: 'You will not be able to recover this record!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedData = data.filter((rowData, index) => index  !== id);
         setData(updatedData);
       }
+    })
+  }
 
-    }, [editedRow, location.state, deletedRow]);
-    
-    const savesubcode = async () => {
-      const reformatData = data.map((record) => ({
-        code_position: record[0],
-        description: record[1],
-        code: record[2],
-        document_id: document,
-      }))
-      .filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
-      await createMultipleSubCode(reformatData);
-      navigate('/subcodes');
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues, // Use formValues if available, otherwise use initialValues
+    onSubmit: async (values) => {
+      try {
+        console.log(data);
+        if (rowIndex !== null) { // Check if rowIndex is not null
+          const updatedData = [...data];
+          if (rowIndex !== null && updatedData[rowIndex]) {
+            updatedData[rowIndex][0] = values.code_position;
+            updatedData[rowIndex][1] = values.description;
+            updatedData[rowIndex][2] = values.code;
+          }
+        }
+        setEditedRow(null);
+        setIsPopupOpen(false);
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    },
+  });
+
+  useEffect(() => {
+    const { formattedData, docId } = location.state;
+    if (formattedData) {
+      setData(formattedData.data);
     }
+  
+    if (docId) {
+      setDocument(docId)
+    }
+  }, [location.state]);
+    
+  const savesubcode = async () => {
+    const reformatData = data.map((record) => ({
+      code_position: record[0],
+      description: record[1],
+      code: record[2],
+      document_id: document,
+    }))
+    .filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
+    await createMultipleSubCode(reformatData);
+    navigate('/subcodes');
+    dispatch(clearData());
+  }
 
     return (
       <div className="d-flex">
@@ -126,20 +130,22 @@ const FormatData = () => {
                   </tr>
               </thead>
               <tbody>
-              {data.map((rowData, rowIndex) => (
-                <tr key={rowIndex}>
-                  <td className="text-center d-none">{rowIndex}</td>
-                  {rowData.map((cellData, cellIndex) => (
-                    <td key={cellIndex}>{cellData}</td>
-                  ))}
-                  <td onClick={() => editRecord(rowIndex)}>   
-                    <img src={EditRecord} width={18} height={18} className="c-pointer" alt="Edit" />
-                  </td>
-                  <td onClick={() => deleteRecord(rowIndex)}>   
-                    <img src={CancelRecord} width={18} height={18} className="c-pointer" alt="Cancel" />
-                  </td>
-                </tr>
-              ))}
+              {data.map((rowData, index) => {
+                return (
+                  <tr key={index}>
+                    <td className="text-center d-none">{index}</td>
+                    {rowData.map((cellData, cellIndex) => (
+                      <td key={cellIndex}>{cellData}</td>
+                    ))}
+                    <td onClick={() => editRecord(index)}>
+                      <img src={EditRecord} width={18} height={18} className="c-pointer" alt="Edit" />
+                    </td>
+                    <td onClick={() => deleteRecord(index)}>
+                      <img src={CancelRecord} width={18} height={18} className="c-pointer" alt="Cancel" />
+                    </td>
+                  </tr>
+                );
+              })}
               </tbody>
             </Table>
             {isPopupOpen && (

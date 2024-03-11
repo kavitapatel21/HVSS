@@ -1,6 +1,5 @@
 import Header from "../../Layout/Header"
 import Sidebar from "../../Layout/Sidebar"
-import IcoSearch from "../../../assets/images/search_ico.svg"
 import IcoMore from "../../../assets/images/more.svg";
 import { useEffect, useState } from "react";
 import { listVendorsAsync, selectVendors, deleteVendorAsync } from "../../../features/vendorSlice";
@@ -12,6 +11,7 @@ import { Dropdown } from "react-bootstrap";
 import AddVendor from "./AddVendor";
 import EditVendor from "./EditVendor";
 import Table from 'react-bootstrap/Table';
+import { showConfirmationDialog } from "../../../utils/SweetAlert";
 
 const Vendors = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -46,9 +46,19 @@ const Vendors = () => {
     };
     
     const handleDeleteVendor = async (vendor) => {
-        await dispatch(deleteVendorAsync(vendor));
-        dispatch(listVendorsAsync());
-        toast.success('Vendor deleted Successfully !')
+        showConfirmationDialog(
+            'Are you sure to delete this record?',
+            'You will not be able to recover this record!',
+            'warning',
+            'Yes, delete it!',
+            'No, cancel',
+            true,
+            async () => {
+                await dispatch(deleteVendorAsync(vendor));
+                dispatch(listVendorsAsync());
+                toast.success('Vendor deleted Successfully !');
+          }
+        );
     }
 
     return (

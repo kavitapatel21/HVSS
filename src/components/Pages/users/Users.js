@@ -12,6 +12,7 @@ import { Dropdown } from "react-bootstrap";
 import AddUser from "./AddUser";
 import EditUser from "./EditUser";
 import Table from 'react-bootstrap/Table';
+import { showConfirmationDialog } from "../../../utils/SweetAlert";
 
 const Users = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -46,8 +47,19 @@ const Users = () => {
     };
     
     const handleDeleteUser = async (user) => {
-        await dispatch(deleteUserAsync(user));
-        toast.success('User deleted Successfully!')
+        showConfirmationDialog(
+            'Are you sure to delete this record?',
+            'You will not be able to recover this record!',
+            'warning',
+            'Yes, delete it!',
+            'No, cancel',
+            true,
+            async () => {
+                await dispatch(deleteUserAsync(user));
+                dispatch(listUsersAsync());
+                toast.success('User deleted Successfully!')
+          }
+        );
     }
 
     return (

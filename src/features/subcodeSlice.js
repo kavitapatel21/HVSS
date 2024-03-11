@@ -95,11 +95,20 @@ export const updateSubCodeAsync = createAsyncThunk(
 
 export const deleteSubCodeAsync = createAsyncThunk(
     'subcodes/delete',
-    async (codeId, { rejectWithValue }) => {
+    async (codeId, { dispatch, rejectWithValue }) => {
         try {
             const response = await deleteSubCode(codeId);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await deleteSubCode(codeId);
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
             } else {
                 return rejectWithValue(response);
             }
@@ -137,11 +146,20 @@ export const listVendorAsync = createAsyncThunk(
 
 export const listDocAsync = createAsyncThunk(
     'doc/list',
-    async (rejectWithValue) => {
+    async (arg, { dispatch, rejectWithValue }) => {
         try {
             const response = await getAllDocuments();
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await getAllDocuments();
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
             } else {
                 return rejectWithValue(response);
             }
