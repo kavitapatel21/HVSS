@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { clearData } from "../../../features/importFileSlice";
 import Swal from 'sweetalert2'
+import Addrule from "../../../assets/images/add-rule.svg";
 
 const FormatData = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const FormatData = () => {
   const [document, setDocument] = useState(0);
   
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [editedRow, setEditedRow] = useState(initialValues);
   const [rowIndex, setRowIndex] = useState(0);
 
@@ -87,6 +89,25 @@ const FormatData = () => {
     },
   });
 
+  const formik2 = useFormik({
+    initialValues: initialValues, // Use formValues if available, otherwise use initialValues
+    onSubmit: async (values) => {
+      try {
+        const updatedData = [...data];
+        const newRecord = [
+          values.code_position,
+          values.description,
+          values.code,
+        ];        
+        updatedData.push(newRecord);
+        setData(updatedData);
+        setIsAddPopupOpen(false);
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    },
+  });
+
   useEffect(() => {
     const { formattedData, docId } = location.state;
     if (formattedData) {
@@ -111,94 +132,146 @@ const FormatData = () => {
     dispatch(clearData());
   }
 
-    return (
-      <div className="d-flex">
-        <Sidebar />
-        <div className="page-wrapper">         
-        <Header />
-        <div className="common-layout">
-          <h2 className="page-title mb-4">Formatted Data</h2>  
-          <div className="table-wrapper">
-            <Table striped>
-              <thead>
-                  <tr>
-                    {/* <th className="text-center">Sr No.</th> */}
-                    <th>Code Position</th>
-                    <th>Description</th>
-                    <th>Code</th>
-                    <th colSpan={2}>Actions</th>
-                  </tr>
-              </thead>
-              <tbody>
-              {data.map((rowData, index) => {
-                return (
-                  <tr key={index}>
-                    <td className="text-center d-none">{index}</td>
-                    {rowData.map((cellData, cellIndex) => (
-                      <td key={cellIndex}>{cellData}</td>
-                    ))}
-                    <td onClick={() => editRecord(index)}>
-                      <img src={EditRecord} width={18} height={18} className="c-pointer" alt="Edit" />
-                    </td>
-                    <td onClick={() => deleteRecord(index)}>
-                      <img src={CancelRecord} width={18} height={18} className="c-pointer" alt="Cancel" />
-                    </td>
-                  </tr>
-                );
-              })}
-              </tbody>
-            </Table>
-            {isPopupOpen && (
-            <Modal backdrop="static" size="md" show={isPopupOpen} onHide={() => setIsPopupOpen(false)}>
-                <Modal.Header closeButton> Edit </Modal.Header>
-                <Modal.Body>
-                <form onSubmit={formik.handleSubmit}>
-                  <div className='form-group mb-4'>
-                      <label htmlFor="code_position" className='label-title mb-2 d-block w-100 text-left'>Code Position</label>
-                      <input 
-                      type="text"
-                      name="code_position"
-                      placeholder="Code Position"
-                      value={formik.values.code_position}
-                      onChange={formik.handleChange}
-                      />
-                  </div>
-                  <div className='form-group mb-4'>
-                    <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Description</label>
+  const addSubcode = () => {
+    setIsAddPopupOpen(true);
+  }
+
+  return (
+    <div className="d-flex">
+      <Sidebar />
+      <div className="page-wrapper">         
+      <Header />
+      <div className="common-layout">
+        <div className="d-md-flex align-items-center justify-content-between">
+        <h2 className="page-title mb-4">Formatted Data</h2>
+          <div className="new-addition">
+            <a onClick={addSubcode} className="new-record d-flex align-items-end">
+              <img src={Addrule} width={18} height={18} className="me-3" alt="Add Record" />
+              Add record
+            </a>
+          </div>
+        </div>    
+        <div className="table-wrapper">
+          <Table striped>
+            <thead>
+                <tr>
+                  {/* <th className="text-center">Sr No.</th> */}
+                  <th>Code Position</th>
+                  <th>Description</th>
+                  <th>Code</th>
+                  <th colSpan={2}>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {data.map((rowData, index) => {
+              return (
+                <tr key={index}>
+                  <td className="text-center d-none">{index}</td>
+                  {rowData.map((cellData, cellIndex) => (
+                    <td key={cellIndex}>{cellData}</td>
+                  ))}
+                  <td onClick={() => editRecord(index)}>
+                    <img src={EditRecord} width={18} height={18} className="c-pointer" alt="Edit" />
+                  </td>
+                  <td onClick={() => deleteRecord(index)}>
+                    <img src={CancelRecord} width={18} height={18} className="c-pointer" alt="Cancel" />
+                  </td>
+                </tr>
+              );
+            })}
+            </tbody>
+          </Table>
+          {isPopupOpen && (
+          <Modal backdrop="static" size="md" show={isPopupOpen} onHide={() => setIsPopupOpen(false)}>
+              <Modal.Header closeButton> Edit </Modal.Header>
+              <Modal.Body>
+              <form onSubmit={formik.handleSubmit}>
+                <div className='form-group mb-4'>
+                    <label htmlFor="code_position" className='label-title mb-2 d-block w-100 text-left'>Code Position</label>
                     <input 
                     type="text"
-                    name="description"
-                    placeholder="Description"
-                    value={formik.values.description}
+                    name="code_position"
+                    placeholder="Code Position"
+                    value={formik.values.code_position}
                     onChange={formik.handleChange}
                     />
-                  </div>
-                  <div className='form-group mb-4'>
-                    <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Code</label>
+                </div>
+                <div className='form-group mb-4'>
+                  <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Description</label>
+                  <input 
+                  type="text"
+                  name="description"
+                  placeholder="Description"
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  />
+                </div>
+                <div className='form-group mb-4'>
+                  <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Code</label>
+                  <input 
+                  type="text"
+                  name="code"
+                  placeholder="Code"
+                  value={formik.values.code}
+                  onChange={formik.handleChange}
+                  />
+                </div>
+                <div className="action-buttons">
+                  <button type="submit" className='primary-button'>Edit</button>
+                  <button className='primary-button' onClick={closePopup}>Cancel</button>
+                </div>
+              </form>
+              </Modal.Body>
+          </Modal>
+          )}
+          {isAddPopupOpen && (
+            <Modal backdrop="static" size="md" show={isAddPopupOpen} onHide={() => setIsAddPopupOpen(false)}>
+              <Modal.Header closeButton> Add Subcode </Modal.Header>
+              <Modal.Body>
+              <form onSubmit={formik2.handleSubmit}>
+                <div className='form-group mb-4'>
+                    <label htmlFor="code_position" className='label-title mb-2 d-block w-100 text-left'>Code Position</label>
                     <input 
                     type="text"
-                    name="code"
-                    placeholder="Code"
-                    value={formik.values.code}
-                    onChange={formik.handleChange}
+                    name="code_position"
+                    placeholder="Code Position"
+                    onChange={formik2.handleChange}
                     />
-                  </div>
-                  <div className="action-buttons">
-                    <button type="submit" className='primary-button'>Edit</button>
-                    <button className='primary-button' onClick={closePopup}>Cancel</button>
-                  </div>
-                </form>
-                </Modal.Body>
-            </Modal>
-            )}
-          </div>
-          <div className="text-end mt-4">
-            <button onClick={savesubcode} className="primary-button ms-auto">Save</button>
-          </div>
+                </div>
+                <div className='form-group mb-4'>
+                  <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Description</label>
+                  <input 
+                  type="text"
+                  name="description"
+                  placeholder="Description"
+                  onChange={formik2.handleChange}
+                  />
+                </div>
+                <div className='form-group mb-4'>
+                  <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Code</label>
+                  <input 
+                  type="text"
+                  name="code"
+                  placeholder="Code"
+                  onChange={formik2.handleChange}
+                  />
+                </div>
+                <div className="action-buttons">
+                  <button type="submit" className='primary-button'>Edit</button>
+                  <button className='primary-button' onClick={closePopup}>Cancel</button>
+                </div>
+              </form>
+              </Modal.Body>
+          </Modal>
+          )}
         </div>
-    </div>
+        <div className="text-end mt-4">
+          <button onClick={savesubcode} className="primary-button ms-auto">Save</button>
+        </div>
       </div>
-    );
+  </div>
+    </div>
+  );
   };
 export default FormatData; 
  

@@ -37,8 +37,7 @@ const HomeSearch = () => {
         }
         if (excelResponse) {
             const downloadExcel = () => {
-                const excelBlob = base64toBlob(excelResponse.excel_blob);
-                console.log(excelBlob);
+                const excelBlob = base64toBlob(excelResponse);
                 const url = URL.createObjectURL(excelBlob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -63,8 +62,7 @@ const HomeSearch = () => {
         setSearchQuery(query);
     };
 
-    const alldetails = Object.entries(details ?? {}).map(([key, value]) => ({ key, value }));
-
+    const alldetails = Object.entries(details && details[0] ? details[0]['code_breakdown'] :  {}).map(([key, value]) => ({ key, value }));
     const uploadExcel = () => {
         fileInputRef.current.click();
     }
@@ -72,11 +70,17 @@ const HomeSearch = () => {
     const handleFileInputChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
-            setIsLoading(true);
-            let formData = new FormData();
-            formData.append("file", selectedFile);
-            dispatch(uploadExcelAsync(formData)).finally(() => setIsLoading(false));
-            event.target.value = '';
+            if (selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||  // For .xlsx
+                selectedFile.type === 'application/vnd.ms-excel' ||  // For .xls
+                selectedFile.type === 'text/csv') { // For .csv
+                setIsLoading(true);
+                let formData = new FormData();
+                formData.append("file", selectedFile);
+                dispatch(uploadExcelAsync(formData)).finally(() => setIsLoading(false));
+                event.target.value = '';
+            } else {
+                toast.error('Please select a valid file type (Excel or CSV).');
+            }
         }
     };
 
@@ -90,7 +94,7 @@ const HomeSearch = () => {
                     <h2 className="page-title mb-4">Search</h2>
                     <input
                         type="file"
-                        accept=".xlsx, .xls"
+                        accept=".xlsx, .xls, .csv"
                         style={{ display: 'none' }}
                         ref={fileInputRef}
                         onChange={handleFileInputChange}
@@ -105,32 +109,37 @@ const HomeSearch = () => {
                                 <input type="text" placeholder="Search" id="search" name="search" value={searchQuery} onChange={handleSearch} />
                             </div>
                         </div>
+                        {isLoading ? (
+                            <SubLoader />
+                        ) : (
+                        (searchQuery === '') ? (
+                            <div></div>
+                        ) : (
                         <Table striped>
                             <thead>
                                 <tr>
+                                    <th style={{width: "10%"}}>Code Position</th>
                                     <th style={{width: "30%"}}>Code</th>
                                     <th style={{width: "70%"}}>Description</th> 
                                 </tr>
                             </thead>
                             <tbody>
-                            {isLoading ? (
-                                <SubLoader />
+                            {alldetails.length === 0  ? (
+                                <tr>
+                                    <td colSpan="3" className="text-center">No data found</td>
+                                </tr>
                             ) : (
-                                (alldetails.length === 0 || searchQuery === '') ? (
-                                    <tr>
-                                        <td colSpan="2" className="text-center">No data found</td>
-                                    </tr>
-                                ) : (
-                                    alldetails.map((detail, i) => (
-                                        <tr key={i}>
-                                            <td>{detail.key}</td>
-                                            <td>{detail.value}</td> 
-                                        </tr>
-                                    ))
-                                )
+                                alldetails.map((detail, i) => (
+                                <tr key={i}>
+                                    <td>{detail.value.code_position}</td>
+                                    <td>{detail.value.code}</td>
+                                    <td>{detail.value.description}</td> 
+                                </tr>
+                            ))
                             )}
                             </tbody>
                         </Table>
+                        ))}
                     </div>
                 </div>
             </div>

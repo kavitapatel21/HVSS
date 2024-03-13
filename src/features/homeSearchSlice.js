@@ -53,7 +53,7 @@ export const uploadExcelAsync = createAsyncThunk(
                     return rejectWithValue(checkLoginResponse.error);
                 }
             }  else if(response.response.status === 400) {
-                return rejectWithValue(response.response.data.error);
+                return rejectWithValue(response.response.data.data);
             } else {
                 return rejectWithValue(response);
             }
@@ -81,21 +81,21 @@ export const subcodeSlice = createSlice({
             .addCase(getCodeDetailsAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 if (action.payload.data) {
-                    state.details = action.payload.data.code_breakdown;
+                    state.details = action.payload.data.new_response;
                     state.error = action.payload.data.error;
                 }
             })
             .addCase(uploadExcelAsync.rejected, (state, action) => {
                 state.status = 'failed';
                 if (action.payload) {
-                    state.excelError = action.payload;
+                    state.excelError = action.payload.error;
                 } else {
                     state.excelError = action.error.message; // Fallback to action.error.message if payload is not available
                 }
             })
             .addCase(uploadExcelAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.document = action.payload;
+                state.document = action.payload.data.excel_blob;
             })
     },
 });

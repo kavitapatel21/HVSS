@@ -40,6 +40,7 @@ const ImportFile = () => {
             dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
             event.target.value = '';
         } else {
+            event.target.value = '';
             toast.error('Please Select the Vendor.')
         }
     };

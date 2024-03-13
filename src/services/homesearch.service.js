@@ -2,19 +2,20 @@ import API from '../services/api';
 
 export const getCodeDetails = (code) => {
     const auth = JSON.parse(localStorage.getItem('user'));
-    console.log(code)
-    const config = {
-        headers: {
-            'Authorization': `Bearer ${auth.access}`
-        },
+    const data = {
+        model_code: code
     };
-    return API.get("product_specification/"+ code, config)
-        .then(response => { 
-            return response; 
-        },
-        error => { 
-            return error; 
-        })
+    return API.post("product_specification", data, {
+        headers:{
+            'Authorization': `Bearer ${auth.access}`
+        }
+    })
+    .then(response => { 
+        return response; 
+    },
+    error => { 
+        return error; 
+    })
 }
 
 export const uploadExcel = (file) => {
