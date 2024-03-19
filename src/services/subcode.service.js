@@ -1,5 +1,5 @@
 import API from '../services/api';
-export const getAllSubCodes = (page, search, vendor_id, doc_id, per_page) => {
+export const getAllSubCodes = (page, search, vendor_id, doc_id, per_page, order) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     const config = {
         headers: {
@@ -20,6 +20,9 @@ export const getAllSubCodes = (page, search, vendor_id, doc_id, per_page) => {
         config.params.page_size = per_page;
     } else {
         config.params.page_size = 10;
+    }
+    if (order) {
+        config.params.ordering = order;
     }
     return API.get("product_subcodes", config)
         .then(response => { 

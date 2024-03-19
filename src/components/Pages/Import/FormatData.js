@@ -14,6 +14,7 @@ import Table from 'react-bootstrap/Table';
 import { clearData } from "../../../features/importFileSlice";
 import Swal from 'sweetalert2'
 import Addrule from "../../../assets/images/add-rule.svg";
+import { toast } from "react-toastify";
 
 const FormatData = () => {
   const location = useLocation();
@@ -33,6 +34,7 @@ const FormatData = () => {
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [editedRow, setEditedRow] = useState(initialValues);
   const [rowIndex, setRowIndex] = useState(0);
+  const [actionStack, setActionStack] = useState([]);
 
   const editRecord = (row) => {
     setRowIndex(row);
@@ -47,7 +49,7 @@ const FormatData = () => {
     setIsPopupOpen(true);
   }
 
-  const deleteRecord = (id) => {
+  const deleteRecord = (rowIndex) => {
     Swal.fire({
       title: 'Are you sure to remove this record?',
       text: 'You will not be able to recover this record!',
@@ -58,11 +60,37 @@ const FormatData = () => {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        const updatedData = data.filter((rowData, index) => index  !== id);
+        const deletedRecord = data[rowIndex];
+        const updatedData = data.filter((rowData, index) => index  !== rowIndex);
         setData(updatedData);
+        setActionStack([...actionStack, { type: 'delete', rowIndex, deletedRecord }]);
       }
     })
   }
+
+  const undoAction = () => {
+    console.log(actionStack);
+    if (actionStack.length > 0) {
+      const lastAction = actionStack.pop(); // Get the last action from the stack
+      if (lastAction.type == 'delete') {
+        const { rowIndex, deletedRecord } = lastAction;
+        console.log(lastAction);
+        const newData = [...data];
+        newData.splice(rowIndex, 0, deletedRecord);
+        setData(newData);
+        setActionStack([...actionStack]);
+      }
+      if (lastAction.type == 'edit') {
+        const { rowIndex, previousState } = lastAction;
+        setData([
+          ...data.slice(0, rowIndex),
+          previousState,
+          ...data.slice(rowIndex + 1)
+        ]);
+        setActionStack([...actionStack]); // Update the action stack
+      }
+    }
+  };
 
   const closePopup = () => {
     setIsPopupOpen(false);
@@ -72,14 +100,16 @@ const FormatData = () => {
     initialValues: initialValues, // Use formValues if available, otherwise use initialValues
     onSubmit: async (values) => {
       try {
-        console.log(data);
         if (rowIndex !== null) { // Check if rowIndex is not null
+          const previousState = [...data[rowIndex]];
           const updatedData = [...data];
           if (rowIndex !== null && updatedData[rowIndex]) {
             updatedData[rowIndex][0] = values.code_position;
             updatedData[rowIndex][1] = values.description;
             updatedData[rowIndex][2] = values.code;
           }
+          setData(updatedData);
+          setActionStack([...actionStack, { type: 'edit', rowIndex, previousState }]);
         }
         setEditedRow(null);
         setIsPopupOpen(false);
@@ -125,11 +155,17 @@ const FormatData = () => {
       description: record[1],
       code: record[2],
       document_id: document,
-    }))
-    .filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
-    await createMultipleSubCode(reformatData);
-    navigate('/subcodes');
-    dispatch(clearData());
+    }));
+    
+    const hasEmptyFields = reformatData.some(record => record.code_position.trim() == '' || record.code.trim() == '');
+    if (hasEmptyFields) {
+      toast.error('Some records have empty code position or code. Please check and edit them!')
+    } else {
+      reformatData.filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
+      await createMultipleSubCode(reformatData);
+      navigate('/subcodes');
+      dispatch(clearData());
+    }
   }
 
   const addSubcode = () => {
@@ -142,15 +178,17 @@ const FormatData = () => {
       <div className="page-wrapper">         
       <Header />
       <div className="common-layout">
-        <div className="d-md-flex align-items-center justify-content-between">
-        <h2 className="page-title mb-4">Formatted Data</h2>
-          <div className="new-addition">
-            <a onClick={addSubcode} className="new-record d-flex align-items-end">
+        <div className="d-md-flex align-items-center justify-content-between mb-4">
+        <h2 className="page-title mb-0">Formatted Data</h2>
+          <div className="new-addition d-flex align-items-center">
+            <a onClick={addSubcode} className="new-record">
               <img src={Addrule} width={18} height={18} className="me-3" alt="Add Record" />
               Add record
             </a>
+            <button className='primary-button ms-3' onClick={undoAction} disabled={actionStack.length === 0}>Undo</button>
           </div>
-        </div>    
+        </div>
+            
         <div className="table-wrapper">
           <Table striped>
             <thead>
@@ -257,7 +295,7 @@ const FormatData = () => {
                   />
                 </div>
                 <div className="action-buttons">
-                  <button type="submit" className='primary-button'>Edit</button>
+                  <button type="submit" className='primary-button'>Add</button>
                   <button className='primary-button' onClick={closePopup}>Cancel</button>
                 </div>
               </form>

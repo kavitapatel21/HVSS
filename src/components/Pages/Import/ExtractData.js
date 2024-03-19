@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { formatDataAsync, formatedData } from "../../../features/importFileSlice";
 import { useNavigate } from 'react-router-dom';
 import Loader from "../../loader";
+import { toast } from "react-toastify";
  
 const ExtractData = () => {
     const location = useLocation();
@@ -45,8 +46,12 @@ const ExtractData = () => {
     };
 
     const formatData = async () => {
-        setIsLoading(true);
-        await dispatch(formatDataAsync(selectedTables)).finally(() => setIsLoading(false));
+        if (selectedTables.length > 0 ) {
+            setIsLoading(true);
+            await dispatch(formatDataAsync(selectedTables)).finally(() => setIsLoading(false));
+        } else {
+            toast.error('Please select atleast one table to format!')
+        }
     }
 
     return (
@@ -56,9 +61,9 @@ const ExtractData = () => {
             <Header />
             <div className="common-layout"> 
                 <div className="extract-format">
-                    <div className="d-flex">
-                        <h2 className="page-title mb-4">Extracted Data</h2>  
-                        <button className="primary-button ms-auto mb-3" onClick={formatData}>Format Data</button> 
+                    <div className="d-flex align-items-center">
+                        <h2 className="page-title mb-0">Extracted Data</h2>  
+                        <button className="primary-button ms-auto" onClick={formatData}>Format Data</button> 
                     </div>
                 </div>
                 

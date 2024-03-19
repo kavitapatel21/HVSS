@@ -33,14 +33,18 @@ button{
         font-size: 14px;
         font-weight: 400;
         border-radius: 4px;
-        padding: 13px 20px;
+        padding: 7px 15px;
         color: var(--white);
-        min-width: 220px;
+        min-width: 150px;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 54px;
+        height: 46px;
     }
+    &.primary-button:disabled {
+        opacity: 0.5; /* Example styling for a disabled button */
+        cursor: not-allowed; /* Example styling for a disabled button */
+      }
     &.transparent-button{
         background-color: transparent !important;
         border: none !important;
@@ -137,6 +141,7 @@ button{
     max-width: calc(100% - 300px);
     width: 100%;
     text-align: left;
+    margin-left: 300px;
 }
 .common-layout{
     padding: 34px 29px 20px 36px;
@@ -391,11 +396,10 @@ button{
 .swal2-container .swal2-confirm{
     background-color: var(--primary) !important;
 }
-// .extract-format{
-//     padding: 16px;
-//     border-bottom: 1px solid var(--border);
-//     position: sticky;
-//     top: 0;
-//     z-index: 9999;
-//     background-color: #ffffff;
-// }
+.extract-format{
+    background: white;
+    position: sticky;
+    top: 68px;
+    z-index: 9;
+    padding: 5px 10px 5px;
+}

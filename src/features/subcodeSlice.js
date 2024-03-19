@@ -21,15 +21,15 @@ export const listSubCodesAsync = createAsyncThunk(
     'subcodes/list',
     async (data, { dispatch, rejectWithValue }) => {
         try {
-            const {currentPage, searchQuery, selectedVendor, selectedDoc, perPage} = data;
-            const response = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage);
+            const {currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order} = data;
+            const response = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage);
+                    const check = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order);
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);

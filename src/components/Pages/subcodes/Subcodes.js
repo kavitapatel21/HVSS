@@ -43,10 +43,22 @@ const Subcodes = () => {
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState(0);
     const [selectedDoc, setSelectedDoc] = useState(0);
+    const [sortColumn, setSortColumn] = useState(null);
+    const [sortDirection, setSortDirection] = useState('asc');
+    const [order, setOrder] = useState(null);
+
+    const handleSort = (column) => {
+        const newDirection = column === sortColumn && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortColumn(column);
+        setSortDirection(newDirection);
+        const order = (newDirection == 'desc' ? '-'+column : column);
+        setOrder(order);
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}))
+    };
 
     useEffect(() => {
         if (!isAddPopupOpen || !isPopupOpen) {
-            dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
+            dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}));
             if(status == 'failed') {
                 toast.error(errorMessage);
                 navigate('/login');
@@ -58,7 +70,7 @@ const Subcodes = () => {
             const pages = Math.ceil(getcount / perPage);
             setTotalPages(pages);
         }
-    }, [dispatch, currentPage, errorMessage, status, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount]);
+    }, [dispatch, currentPage, errorMessage, status, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount, order]);
 
     const getAllVendors = useSelector(allVendors);
     const getAllDocs = useSelector(allDocuments);
@@ -67,7 +79,7 @@ const Subcodes = () => {
     const handlePageChange = ({ selected }) => {
         dispatch(setCurrentPage(selected + 1));
         const currentPage = selected + 1;
-        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}));
         setOffset(selected * perPage);
     };
 
@@ -96,7 +108,7 @@ const Subcodes = () => {
           true,
           async () => {
             await dispatch(deleteSubCodeAsync(code));
-            dispatch(listSubCodesAsync({ currentPage, searchQuery, selectedVendor, selectedDoc, perPage }));
+            dispatch(listSubCodesAsync({ currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order }));
             toast.success('Subcode Deleted Successfully!');
         }
         );
@@ -124,7 +136,7 @@ const Subcodes = () => {
     const handlePerPage = (eventKey) => {
         setPerPage(eventKey);
         const perPage = eventKey;
-        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage}));
+        dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}));
     }
     
     return (
@@ -207,7 +219,11 @@ const Subcodes = () => {
                         <thead>
                             <tr>
                                 {/* <th>Sr No.</th> */}
-                                <th>Code Position</th>
+                                <th onClick={() => handleSort('code_position')}>
+                                    Code Position {sortColumn === 'code_position' && (
+                                    <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                                    )}
+                                </th>
                                 <th>Description</th>
                                 <th>Code</th>
                                 <th>PDF Name</th>
