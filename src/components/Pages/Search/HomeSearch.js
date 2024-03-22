@@ -4,7 +4,8 @@ import "../../../assets/scss/search.scss";
 import IcoSearch from "../../../assets/images/search_ico.svg"
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { getCodeDetailsAsync, codedetails, codeError, uploadExcelAsync, responseExcel, responseExcelError } from "../../../features/homeSearchSlice";
+import { getCodeDetailsAsync, codedetails, codeError, uploadExcelAsync, responseExcel, 
+    responseExcelError, checkImportFile, checkImportFileStatus, dwnldFileAsync, importFileError } from "../../../features/homeSearchSlice";
 import SubLoader from "../../inner_loader";
 import Table from 'react-bootstrap/Table';
 import { toast } from "react-toastify";
@@ -15,47 +16,55 @@ const HomeSearch = () => {
     const error = useSelector(codeError);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [stopImportCall, setStopImportCall] = useState(false);
+    const [fileReady, setFileReady] = useState('');
+    const [fileId, setFileId] = useState(0);
+    const [file, setFile] = useState(null);
     const fileInputRef = useRef(null);
     const excelResponse = useSelector(responseExcel);
     const excelError = useSelector(responseExcelError);
+    const checkFileStatus = useSelector(checkImportFileStatus);
+    const importError = useSelector(importFileError);
 
-    const base64toBlob = (base64String) => {
-        const byteCharacters = atob(base64String);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        return new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    }
-
+    let callImport;
     useEffect(() => {
+        dispatch(checkImportFile());
+
+        callImport = setInterval(() => {
+            dispatch(checkImportFile());
+        }, 30000);
+        
+        if (excelResponse) {
+            toast.success(excelResponse.message);
+        }
+
         if (searchQuery != '') {
             setIsLoading(true);
             dispatch(getCodeDetailsAsync(searchQuery))
                 .finally(() => setIsLoading(false));
         }
-        if (excelResponse) {
-            const downloadExcel = () => {
-                const excelBlob = base64toBlob(excelResponse);
-                const url = URL.createObjectURL(excelBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'Export_Code_Specification.xlsx');
-                document.body.appendChild(link);
-                link.click();
-                toast.success("Excel Code Specification File Downloded Successfully!")
-            };
-    
-            // Invoke the download function after a brief delay to ensure the link is fully ready
-            const timeout = setTimeout(downloadExcel, 100);
-            return () => clearTimeout(timeout);
-        }
+        return () => clearInterval(callImport);
+        
+    }, [dispatch, searchQuery, excelResponse]);
+
+    useEffect(() => {
 
         if (excelError) {
-            toast.error(excelError);
+          toast.error(excelError);
         }
-    }, [dispatch, searchQuery, excelResponse, excelError]);
+
+        if (checkFileStatus) {
+          setFileReady(checkFileStatus.status)
+          if (checkFileStatus.status == 'Ready') {
+            clearInterval(callImport);
+            setFileId(checkFileStatus.id);
+            setFile(checkFileStatus.output_file);
+          } else if (checkFileStatus.status == 'In-progress') {
+            toast.success('The File uploding is In-Progress. You will be able to download when it will be ready.')
+          }
+        }
+      }, [excelError, checkFileStatus, importError]);
+    
 
     const handleSearch = (event) => {
         const query = event.target.value;
@@ -66,8 +75,31 @@ const HomeSearch = () => {
     const uploadExcel = () => {
         fileInputRef.current.click();
     }
+
+    const downloadExcel = () => {
+        if(importError) {
+            toast.error(importError);
+        } else {
+            const filename = file.substring(file.lastIndexOf('/') + 1);
+            downloadFile(file, filename);
+        }
+        if (fileReady && fileId != 0) {
+            dispatch(dwnldFileAsync(fileId));
+            setFileReady('Downloaded');
+        }
+    }
+
+    const downloadFile = (url, filename) => {
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+      };
+
+    const pdfName = details && details[0] ? details[0].document.name : {};
     
     const handleFileInputChange = (event) => {
+        setFileReady('In-progress');
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             if (selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||  // For .xlsx
@@ -75,7 +107,7 @@ const HomeSearch = () => {
                 selectedFile.type === 'text/csv') { // For .csv
                 setIsLoading(true);
                 let formData = new FormData();
-                formData.append("file", selectedFile);
+                formData.append("input_file", selectedFile);
                 dispatch(uploadExcelAsync(formData)).finally(() => setIsLoading(false));
                 event.target.value = '';
             } else {
@@ -90,7 +122,7 @@ const HomeSearch = () => {
         <div className="page-wrapper search position-relative">         
             <Header />
             <div className="common-layout">
-                <div className="d-flex">
+                <div className="d-flex justify-items-end">
                     <h2 className="page-title mb-4">Search</h2>
                     <input
                         type="file"
@@ -99,7 +131,8 @@ const HomeSearch = () => {
                         ref={fileInputRef}
                         onChange={handleFileInputChange}
                     />
-                    <button className="primary-button ms-auto mb-3" onClick={uploadExcel}>Upload Excel</button> 
+                    <button className="primary-button ms-auto mb-3 me-md-2" onClick={uploadExcel} disabled={fileReady == 'In-progress' || fileReady == 'Ready'}>Upload Excel</button> 
+                    <button className="primary-button mb-3" onClick={downloadExcel} disabled={fileReady == 'Downloaded' || fileReady == 'In-progress'}>Downloded Excel</button> 
                 </div>
                 <div className="table-wrapper py-4">
                     <div className="search-data mx-auto">
@@ -115,7 +148,12 @@ const HomeSearch = () => {
                         (searchQuery === '') ? (
                             <div></div>
                         ) : (
+                        <>
+                        <div className="text-end">
+                            <strong>Pdf Name : {pdfName}</strong>
+                        </div>
                         <Table striped>
+                            
                             <thead>
                                 <tr>
                                     <th style={{width: "10%"}}>Code Position</th>
@@ -139,6 +177,7 @@ const HomeSearch = () => {
                             )}
                             </tbody>
                         </Table>
+                        </>
                         ))}
                     </div>
                 </div>

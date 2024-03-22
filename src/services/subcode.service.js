@@ -66,8 +66,6 @@ export const createMultipleSubCode = (data) => {
     })
 }
 
-
-
 export const updateSubCode = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     data.document_id = data.document_id.id;
@@ -90,6 +88,9 @@ export const getAllVendors = () => {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
+        params: {
+            only_having_subcode: true
+        }
     };
     return API.get("vendor", config)
         .then(response => { 
@@ -106,6 +107,9 @@ export const getAllDocuments = () => {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
+        params: {
+            only_having_subcode: true
+        }
     };
     return API.get("upload-document", config)
         .then(response => { 

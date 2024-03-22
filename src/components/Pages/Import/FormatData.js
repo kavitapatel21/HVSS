@@ -35,6 +35,7 @@ const FormatData = () => {
   const [editedRow, setEditedRow] = useState(initialValues);
   const [rowIndex, setRowIndex] = useState(0);
   const [actionStack, setActionStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
 
   const editRecord = (row) => {
     setRowIndex(row);
@@ -64,32 +65,54 @@ const FormatData = () => {
         const updatedData = data.filter((rowData, index) => index  !== rowIndex);
         setData(updatedData);
         setActionStack([...actionStack, { type: 'delete', rowIndex, deletedRecord }]);
+        setRedoStack([]);
       }
     })
   }
 
   const undoAction = () => {
-    console.log(actionStack);
     if (actionStack.length > 0) {
       const lastAction = actionStack.pop(); // Get the last action from the stack
-      if (lastAction.type == 'delete') {
+      if (lastAction.type === 'delete') {
         const { rowIndex, deletedRecord } = lastAction;
-        console.log(lastAction);
         const newData = [...data];
         newData.splice(rowIndex, 0, deletedRecord);
         setData(newData);
-        setActionStack([...actionStack]);
-      }
-      if (lastAction.type == 'edit') {
-        const { rowIndex, previousState } = lastAction;
-        setData([
-          ...data.slice(0, rowIndex),
-          previousState,
-          ...data.slice(rowIndex + 1)
-        ]);
-        setActionStack([...actionStack]); // Update the action stack
+        setRedoStack([...redoStack, lastAction]);
+      } else if (lastAction.type === 'edit') {
+        const { rowIndex, previousState, currentState } = lastAction;
+        const updatedData = [...data];
+        updatedData[rowIndex] = previousState; // Restore the current state
+        setData(updatedData);
+        setRedoStack([...redoStack, lastAction]);
+      } else if (lastAction.type === 'add') {
+        const updatedData = [...data];
+        updatedData.pop();
+        setData(updatedData);
+        setRedoStack([...redoStack, lastAction]);
       }
     }
+  };
+
+  const redoAction = () => {
+    const lastRedoAction = redoStack.pop();
+      if (lastRedoAction.type == 'edit') {
+        const { rowIndex, currentState } = lastRedoAction;
+        const updatedData = [...data];
+        updatedData[rowIndex] = currentState; // Restore previous state
+        setData(updatedData);
+        setActionStack([...actionStack, lastRedoAction]); // Re-add the undone action to the undo stack
+      } else if (lastRedoAction.type == 'delete') {
+        const { rowIndex, deletedRecord } = lastRedoAction;
+        const updatedData = [...data];
+        updatedData.splice(rowIndex, 1);
+        setData(updatedData);
+        setActionStack([...actionStack, lastRedoAction]); // Re-add the undone action to the undo stack
+      } else if (lastRedoAction.type == 'add') {
+        const { newRecord } = lastRedoAction;
+        setData([...data, newRecord]); // Add the new record back to the data
+        setActionStack([...actionStack, lastRedoAction]);
+      }
   };
 
   const closePopup = () => {
@@ -108,8 +131,10 @@ const FormatData = () => {
             updatedData[rowIndex][1] = values.description;
             updatedData[rowIndex][2] = values.code;
           }
+          const currentState = updatedData[rowIndex];
           setData(updatedData);
-          setActionStack([...actionStack, { type: 'edit', rowIndex, previousState }]);
+          setActionStack([...actionStack, { type: 'edit', rowIndex, previousState, currentState }]);
+          setRedoStack([]);
         }
         setEditedRow(null);
         setIsPopupOpen(false);
@@ -132,6 +157,8 @@ const FormatData = () => {
         updatedData.push(newRecord);
         setData(updatedData);
         setIsAddPopupOpen(false);
+        setActionStack([...actionStack, { type: 'add', newRecord }]);
+        setRedoStack([]);
       } catch (error) {
         console.error('An error occurred:', error);
       }
@@ -186,6 +213,9 @@ const FormatData = () => {
               Add record
             </a>
             <button className='primary-button ms-3' onClick={undoAction} disabled={actionStack.length === 0}>Undo</button>
+            <button className='primary-button ms-3' onClick={redoAction} disabled={redoStack.length === 0}>
+              Redo
+            </button>
           </div>
         </div>
             
