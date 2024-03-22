@@ -16,6 +16,7 @@ const initialState = {
     documents: null,
     perPage: null,
     multiCodeStatus: null,
+    addStatus: null,
 };
 
 export const listSubCodesAsync = createAsyncThunk(
@@ -60,6 +61,8 @@ export const addSubCodeAsync = createAsyncThunk(
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
                 }
+            } else if(response.response.status === 400) {
+                return rejectWithValue(response.response.data);
             } else {
                 return rejectWithValue(response);
             }
@@ -70,7 +73,7 @@ export const addSubCodeAsync = createAsyncThunk(
 );
 
 export const addMultipleCodeAsync = createAsyncThunk(
-    'subcodes/create',
+    'subcodes/multicreate',
     async (data, { dispatch, rejectWithValue }) => {
         try {
             const response = await createMultipleSubCode(data);
@@ -254,6 +257,17 @@ export const subcodeSlice = createSlice({
                 state.multiCodeStatus = 'success';
                 console.log(action);
             })
+            .addCase(addSubCodeAsync.rejected, (state, action) => {
+                state.addStatus = 'failed';
+                if (action.payload) {
+                    state.error = action.payload.data[0]['code_position'];
+                } else {
+                    state.error = action.error.message; // Fallback to action.error.message if payload is not available
+                }
+            })
+            .addCase(addSubCodeAsync.fulfilled, (state, action) => {
+                state.addStatus = 'success';
+            })
 
     },
 });
@@ -268,4 +282,5 @@ export const allVendors = (state) => state.subcodes.vendors;
 export const allDocuments = (state) => state.subcodes.documents;
 export const count = (state) => state.subcodes.count;
 export const multipleCodeStatus = (state) => state.subcodes.multiCodeStatus;
+export const addCodeStatus = (state) => state.subcodes.addStatus;
 export default subcodeSlice.reducer;

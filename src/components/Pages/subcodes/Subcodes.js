@@ -8,7 +8,7 @@ import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { selectSubcodes, listSubCodesAsync, selectCurrentPage, 
     count, setCurrentPage, selectStatus, getError,
-    deleteSubCodeAsync } from "../../../features/subcodeSlice";
+    deleteSubCodeAsync, addStatus, addCodeStatus } from "../../../features/subcodeSlice";
 import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
 import { listDocAsync, allDocuments } from "../../../features/documentSlice";
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,6 +47,7 @@ const Subcodes = () => {
     const [sortColumn, setSortColumn] = useState(null);
     const [sortDirection, setSortDirection] = useState('asc');
     const [order, setOrder] = useState(null);
+    const addSubcodeStatus = useSelector(addCodeStatus)
 
     const handleSort = (column) => {
         const newDirection = column === sortColumn && sortDirection === 'asc' ? 'desc' : 'asc';
@@ -72,8 +73,14 @@ const Subcodes = () => {
             dispatch(listDocAsync(havingSubcodes));
             const pages = Math.ceil(getcount / perPage);
             setTotalPages(pages);
+
+            if (addSubcodeStatus == 'failed') {
+                toast.error('Code Position should be a valid integer.')
+            } else if (addSubcodeStatus == 'success') { 
+                toast.success('Subcode Added Successfully !')
+            }
         }
-    }, [dispatch, currentPage, errorMessage, status, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount, order]);
+    }, [dispatch, currentPage, errorMessage, status, addSubcodeStatus, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount, order]);
 
     const getAllVendors = useSelector(allVendors);
     const getAllDocs = useSelector(allDocuments);
