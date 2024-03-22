@@ -2,7 +2,7 @@ import Header from "../../Layout/Header"
 import Sidebar from "../../Layout/Sidebar"
 import IcoMore from "../../../assets/images/more.svg";
 import { useEffect, useState } from "react";
-import { listVendorsAsync, selectVendors, deleteVendorAsync } from "../../../features/vendorSlice";
+import { listVendorsAsync, allVendors, deleteVendorAsync } from "../../../features/vendorSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,7 @@ const Vendors = () => {
         }
     }, [dispatch, isAddPopupOpen, isEditPopupOpen]);
 
-    const vendors = useSelector(selectVendors);
+    const vendors = useSelector(allVendors);
 
     const [editedRow, setEditedRow] = useState(null);
     const handleEditPopup = (row) => {

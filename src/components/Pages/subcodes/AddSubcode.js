@@ -1,13 +1,15 @@
 import { useFormik } from 'formik';
 import { addSubCodeAsync } from "../../../features/subcodeSlice";
+import { listDocAsync, allDocuments } from "../../../features/documentSlice";
 import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 
-const AddSubcode = ({ onClose, vendors, documents }) => {
+const AddSubcode = ({ onClose }) => {
   const dispatch = useDispatch();
   const [selectedDoc, setSelectedDoc] = useState(0);
+  const documents = useSelector(allDocuments)
   const validate = values => {
     const errors = {};
     if (!values.code_position && formik.touched.code_position) {
@@ -23,6 +25,11 @@ const AddSubcode = ({ onClose, vendors, documents }) => {
   
     return errors;
   }
+
+  useEffect(() => {
+    const havingSubcodes = false;
+    dispatch(listDocAsync(havingSubcodes));
+  }, [dispatch]);
 
   const formik = useFormik({
     initialValues: { code_position: '', description: '', code: '', document_id: '' },

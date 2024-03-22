@@ -8,7 +8,7 @@ import EditRecord from "../../../assets/images/edit.svg"
 import { Modal } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { createMultipleSubCode } from "../../../services/subcode.service";
+import { addMultipleCodeAsync, multipleCodeStatus } from "../../../features/subcodeSlice";
 import { useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { clearData } from "../../../features/importFileSlice";
@@ -36,6 +36,7 @@ const FormatData = () => {
   const [rowIndex, setRowIndex] = useState(0);
   const [actionStack, setActionStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
+  const multiCodeStatus = useSelector(multipleCodeStatus);
 
   const editRecord = (row) => {
     setRowIndex(row);
@@ -119,6 +120,10 @@ const FormatData = () => {
     setIsPopupOpen(false);
   };
 
+  const closeAddPopup = () => {
+    setIsAddPopupOpen(false);
+  };
+
   const formik = useFormik({
     initialValues: initialValues, // Use formValues if available, otherwise use initialValues
     onSubmit: async (values) => {
@@ -174,7 +179,7 @@ const FormatData = () => {
     if (docId) {
       setDocument(docId)
     }
-  }, [location.state]);
+  }, [location.state, dispatch]);
     
   const savesubcode = async () => {
     const reformatData = data.map((record) => ({
@@ -189,9 +194,13 @@ const FormatData = () => {
       toast.error('Some records have empty code position or code. Please check and edit them!')
     } else {
       reformatData.filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
-      await createMultipleSubCode(reformatData);
-      navigate('/subcodes');
-      dispatch(clearData());
+      await dispatch(addMultipleCodeAsync(reformatData));
+      if (multiCodeStatus == 'failed') {
+        toast.error('Please Enter Valid Data. Code Position should be Integer, Description & Code should be String.')
+      } else if (multiCodeStatus == 'success') {
+        navigate('/subcodes');
+        dispatch(clearData());
+      }
     }
   }
 
@@ -326,7 +335,7 @@ const FormatData = () => {
                 </div>
                 <div className="action-buttons">
                   <button type="submit" className='primary-button'>Add</button>
-                  <button className='primary-button' onClick={closePopup}>Cancel</button>
+                  <button className='primary-button' onClick={closeAddPopup}>Cancel</button>
                 </div>
               </form>
               </Modal.Body>

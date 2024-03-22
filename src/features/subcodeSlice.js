@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { getAllSubCodes, createSubCode, updateSubCode, getAllVendors, 
-    getAllDocuments, deleteSubCode } from "../services/subcode.service";
+    getAllDocuments, deleteSubCode, createMultipleSubCode } from "../services/subcode.service";
 import { checkLoginAsync } from "../features/loginSlice";
 
 const initialState = {
@@ -14,7 +14,8 @@ const initialState = {
     error: null,
     vendors: null,
     documents: null,
-    perPage: null
+    perPage: null,
+    multiCodeStatus: null,
 };
 
 export const listSubCodesAsync = createAsyncThunk(
@@ -67,6 +68,34 @@ export const addSubCodeAsync = createAsyncThunk(
         }
     }
 );
+
+export const addMultipleCodeAsync = createAsyncThunk(
+    'subcodes/create',
+    async (data, { dispatch, rejectWithValue }) => {
+        try {
+            const response = await createMultipleSubCode(data);
+            console.log(response);
+            if (response.status === 200) {
+                return response.data; 
+            } else if(response.response.status === 401) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
+                if (checkLoginResponse.payload) {
+                    const check = await createMultipleSubCode(data);
+                    return check.data;
+                } else {
+                    return rejectWithValue(checkLoginResponse.error);
+                }
+            } else {
+                return rejectWithValue(response);
+            }
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+
 
 export const updateSubCodeAsync = createAsyncThunk(
     'subcodes/post',
@@ -213,6 +242,19 @@ export const subcodeSlice = createSlice({
                 state.status = 'succeeded';
                 state.documents = action.payload.data.results;  
             })
+            .addCase(addMultipleCodeAsync.rejected, (state, action) => {
+                state.multiCodeStatus = 'failed';
+                if (action.payload) {
+                    state.error = action.payload.message;
+                } else {
+                    state.error = action.error.message; // Fallback to action.error.message if payload is not available
+                }
+            })
+            .addCase(addMultipleCodeAsync.fulfilled, (state, action) => {
+                state.multiCodeStatus = 'success';
+                console.log(action);
+            })
+
     },
 });
 
@@ -225,4 +267,5 @@ export const selectStatus = (state) => state.subcodes.status;
 export const allVendors = (state) => state.subcodes.vendors;
 export const allDocuments = (state) => state.subcodes.documents;
 export const count = (state) => state.subcodes.count;
+export const multipleCodeStatus = (state) => state.subcodes.multiCodeStatus;
 export default subcodeSlice.reducer;

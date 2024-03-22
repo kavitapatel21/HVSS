@@ -5,6 +5,7 @@ import codeReducer from "../features/homeSearchSlice";
 import userReducer from "../features/userSlice";
 import importReducer from "../features/importFileSlice";
 import vendorReducer from "../features/vendorSlice";
+import documentReducer from "../features/documentSlice";
 
 export default configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export default configureStore({
         users: userReducer,
         extractedData: importReducer,
         vendors: vendorReducer,
+        documents: documentReducer,
     },
 });

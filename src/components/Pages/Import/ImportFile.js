@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { uploadDocumentAsync, documentData, getExtractDataAsync, extractedData, extractedStatus } from "../../../features/importFileSlice";
 import { useNavigate } from 'react-router-dom';
 import SubLoader from "../../inner_loader";
-import { listVendorAsync, allVendors } from "../../../features/subcodeSlice";
+import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
 import { toast } from 'react-toastify';
 
 const ImportFile = () => {
@@ -46,7 +46,8 @@ const ImportFile = () => {
     };
 
     useEffect(() => {
-        dispatch(listVendorAsync());
+        const havingSubcodes = false;
+        dispatch(listVendorsAsync(havingSubcodes));
         if (docData) {
             setExtractData(true);
         }

@@ -7,9 +7,10 @@ import IcoSearch from "../../../assets/images/search_ico.svg";
 import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { selectSubcodes, listSubCodesAsync, selectCurrentPage, 
-    count, setCurrentPage, selectStatus, getError, 
-    listVendorAsync, allVendors, listDocAsync, allDocuments,
+    count, setCurrentPage, selectStatus, getError,
     deleteSubCodeAsync } from "../../../features/subcodeSlice";
+import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
+import { listDocAsync, allDocuments } from "../../../features/documentSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import ReactPaginate from 'react-paginate';
 import { toast } from 'react-toastify';
@@ -64,9 +65,11 @@ const Subcodes = () => {
                 navigate('/login');
             }
             if (authUser && authUser.user.role == 'admin') {
-                dispatch(listVendorAsync());
+                const allVendor = true;
+                dispatch(listVendorsAsync(allVendor));
             }
-            dispatch(listDocAsync());
+            const havingSubcodes = true;
+            dispatch(listDocAsync(havingSubcodes));
             const pages = Math.ceil(getcount / perPage);
             setTotalPages(pages);
         }
@@ -123,6 +126,8 @@ const Subcodes = () => {
     }
 
     const closeAddPopup = () => {
+        const havingSubcodes = true;
+        dispatch(listDocAsync(havingSubcodes));
         setIsAddPopupOpen(false);
     };
 
@@ -275,7 +280,7 @@ const Subcodes = () => {
                     {isAddPopupOpen && (
                     <Modal backdrop="static" size="md" show={isAddPopupOpen} onHide={() => setIsAddPopupOpen(false)}>
                         <Modal.Header closeButton> Add Subcode </Modal.Header>
-                        <Modal.Body><AddSubcode onClose={closeAddPopup} vendors={getAllVendors} documents={getAllDocs}/> </Modal.Body>
+                        <Modal.Body><AddSubcode onClose={closeAddPopup}/> </Modal.Body>
                     </Modal>
                     )}
                 </div>

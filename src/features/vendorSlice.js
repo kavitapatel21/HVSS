@@ -13,16 +13,17 @@ const initialState = {
 
 export const listVendorsAsync = createAsyncThunk(
     'vendor/list',
-    async (arg, { dispatch, rejectWithValue }) => {
+    async (allvendor, { dispatch, rejectWithValue }) => {
         try {
-            const response = await getAllVendors();
+            console.log(allvendor);
+            const response = await getAllVendors(allvendor);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
             } else if(response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
-                    const check = await getAllVendors();
+                    const check = await getAllVendors(allvendor);
                     return check.data;
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
@@ -125,5 +126,5 @@ export const vendorSlice = createSlice({
 });
 
 
-export const selectVendors = (state) => state.vendors.vendors;
+export const allVendors = (state) => state.vendors.vendors;
 export default vendorSlice.reducer;

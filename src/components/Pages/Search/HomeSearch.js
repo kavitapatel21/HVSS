@@ -29,13 +29,11 @@ const HomeSearch = () => {
     let callImport;
     useEffect(() => {
         dispatch(checkImportFile());
-
-        callImport = setInterval(() => {
-            dispatch(checkImportFile());
-        }, 30000);
-        
-        if (excelResponse) {
-            toast.success(excelResponse.message);
+       
+        if (fileReady == 'In-progress') {
+            callImport = setInterval(() => {
+                dispatch(checkImportFile());
+            }, 30000);
         }
 
         if (searchQuery != '') {
@@ -45,10 +43,9 @@ const HomeSearch = () => {
         }
         return () => clearInterval(callImport);
         
-    }, [dispatch, searchQuery, excelResponse]);
+    }, [dispatch, searchQuery, fileReady]);
 
     useEffect(() => {
-
         if (excelError) {
           toast.error(excelError);
         }
@@ -59,8 +56,6 @@ const HomeSearch = () => {
             clearInterval(callImport);
             setFileId(checkFileStatus.id);
             setFile(checkFileStatus.output_file);
-          } else if (checkFileStatus.status == 'In-progress') {
-            toast.success('The File uploding is In-Progress. You will be able to download when it will be ready.')
           }
         }
       }, [excelError, checkFileStatus, importError]);
@@ -77,6 +72,7 @@ const HomeSearch = () => {
     }
 
     const downloadExcel = () => {
+        setFileReady('Downloaded');
         if(importError) {
             toast.error(importError);
         } else {
@@ -85,7 +81,6 @@ const HomeSearch = () => {
         }
         if (fileReady && fileId != 0) {
             dispatch(dwnldFileAsync(fileId));
-            setFileReady('Downloaded');
         }
     }
 
@@ -96,7 +91,7 @@ const HomeSearch = () => {
         anchor.click();
       };
 
-    const pdfName = details && details[0] ? details[0].document.name : {};
+    const pdfName = details && details[0] ? details[0].document.name : '';
     
     const handleFileInputChange = (event) => {
         setFileReady('In-progress');
@@ -131,8 +126,11 @@ const HomeSearch = () => {
                         ref={fileInputRef}
                         onChange={handleFileInputChange}
                     />
-                    <button className="primary-button ms-auto mb-3 me-md-2" onClick={uploadExcel} disabled={fileReady == 'In-progress' || fileReady == 'Ready'}>Upload Excel</button> 
-                    <button className="primary-button mb-3" onClick={downloadExcel} disabled={fileReady == 'Downloaded' || fileReady == 'In-progress'}>Downloded Excel</button> 
+                    <button className={`primary-button ms-auto mb-3 me-md-2 ${fileReady == 'In-progress' || fileReady == 'Ready' ? 'd-none' : ''}`} onClick={uploadExcel}>Upload Excel</button>
+                    <button className={`primary-button ms-auto mb-3 ${fileReady !== 'In-progress' ? 'd-none' : ''}`} disabled>Processing</button>
+                    {fileReady == 'Ready' && fileReady !== 'Downloaded' && (
+                        <button className="primary-button ms-auto mb-3" onClick={downloadExcel}>Download Excel</button>
+                    )}
                 </div>
                 <div className="table-wrapper py-4">
                     <div className="search-data mx-auto">

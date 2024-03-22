@@ -1,12 +1,16 @@
 import API from './api';
 
-export const getAllVendors = () => {
+export const getAllVendors = (allvendor) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     const config = {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
+        params: {}
     };
+    if (allvendor) {
+        config.params.only_having_subcode = allvendor;
+    }
     return API.get("vendor", config)
         .then(response => { 
             return response; 
