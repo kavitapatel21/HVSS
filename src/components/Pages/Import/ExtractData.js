@@ -68,20 +68,22 @@ const ExtractData = () => {
                 </div>
                 
                 <div className="table-wrapper extract">
-                    {isLoading ? (
-                        <Loader />
-                    ) : (
-                    tablesData && tablesData.map((tableData, index) => (
-                    <div key={index}>
-                        <TableComponent 
-                            tableData={tableData} 
-                            onSelect={() => handleTableSelect(tableData)}
-                            onCancel={() => handleTableCancel(index)}
-                        />
-                        {index < data.length - 1 && <div className="m-0"></div>}
-                    </div>
+                {isLoading ? (
+                    <Loader />
+                ) : tablesData && tablesData.length > 0 ? (
+                    tablesData.map((tableData, index) => (
+                        <div key={index}>
+                            <TableComponent 
+                                tableData={tableData} 
+                                onSelect={() => handleTableSelect(tableData)}
+                                onCancel={() => handleTableCancel(index)}
+                            />
+                            {index < tablesData.length - 1 && <div className="m-0"></div>}
+                        </div>
                     ))
-                    )}
+                ) : (
+                    <div className="d-flex"><p>No tables found.</p></div>
+                )}
                 </div>
             </div>
         </div>

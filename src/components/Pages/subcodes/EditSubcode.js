@@ -8,15 +8,19 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
   const dispatch = useDispatch();
   const validate = values => {
     const errors = {};
-    if (!values.code_position && formik.touched.code_position) {
-      errors.position = 'Position is Required';
+    if (!values.code_position) {
+      errors.code_position = 'Code Position is Required';
     }
-    if (!values.description && formik.touched.description) {
+    if (!values.description) {
       errors.description = 'Description is Required';
     }
   
-    if (!values.code && formik.touched.code) {
+    if (!values.code) {
       errors.code = 'Code is Required';
+    }
+
+    if (!values.document_id) {
+      errors.document_id = 'Document is Required';
     }
   
     return errors;
@@ -57,16 +61,18 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
               value={formik.values.code_position}
               onChange={formik.handleChange}
               />
+              {formik.errors.code_position && formik.touched.code_position && <div className="error-message">{formik.errors.code_position}</div>}
             </div>
             <div className='form-group mb-4'>
               <label htmlFor="description" className='label-title mb-2 d-block w-100 text-left'>Description</label>
               <input 
               type="text"
               name="description"
-              placeholder="description"
+              placeholder="Description"
               value={formik.values.description}
               onChange={formik.handleChange}
               />
+              {formik.errors.description && formik.touched.description && <div className="error-message">{formik.errors.description}</div>}
             </div>
             <div className='form-group mb-4'>
               <label htmlFor="code" className='label-title mb-2 d-block w-100 text-left'>Code</label>
@@ -77,6 +83,7 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
               value={formik.values.code}
               onChange={formik.handleChange}
               />
+              {formik.errors.code && formik.touched.code && <div className="error-message">{formik.errors.code}</div>}
             </div>
             {/* { authUser && authUser.user.role == 'admin' && (
               <div className='form-group mb-4'>
@@ -113,6 +120,7 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
                       ))}
                   </Dropdown.Menu>
                 </Dropdown>
+                {formik.errors.document_id && formik.touched.document_id && <div className="error-message">{formik.errors.document_id}</div>}
             </div>
             <div className="action-buttons">
               <button type="submit" className='primary-button'>Update</button>

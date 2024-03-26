@@ -123,7 +123,7 @@ const AddSubcode = ({ onClose }) => {
                   : 'Select Document'
                   }
                   </Dropdown.Toggle>
-                  <Dropdown.Menu>
+                  <Dropdown.Menu style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     <Dropdown.Item key="0" eventKey="0" active={selectedDoc == 0}>
                       Select Document
                     </Dropdown.Item>

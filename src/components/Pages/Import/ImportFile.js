@@ -52,7 +52,11 @@ const ImportFile = () => {
             setExtractData(true);
         }
         if (tableData) {
-            navigate('/extract', { state: {data: tableData, document_id:docData.id } });
+            if (tableData.length > 0) {
+                navigate('/extract', { state: {data: tableData, document_id:docData.id } });
+            } else {
+                toast.error('No Tables Found in the Imported PDF.')
+            }
         }
     }, [docData, extractData, tableData]);
 

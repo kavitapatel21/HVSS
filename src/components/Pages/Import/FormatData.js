@@ -189,17 +189,18 @@ const FormatData = () => {
       document_id: document,
     }));
     
-    const hasEmptyFields = reformatData.some(record => record.code_position.trim() == '' || record.code.trim() == '');
+    const hasEmptyFields = reformatData.some(record => record.code.trim() == '');
     if (hasEmptyFields) {
-      toast.error('Some records have empty code position or code. Please check and edit them!')
+      toast.error('Some records have empty code. Please check and edit them!')
     } else {
-      reformatData.filter((record) => record.code_position.trim() !== '' && record.code.trim() !== '');
+      reformatData.filter((record) => record.code.trim() !== '');
       await dispatch(addMultipleCodeAsync(reformatData));
       if (multiCodeStatus == 'failed') {
         toast.error('Please Enter Valid Data. Code Position should be Integer, Description & Code should be String.')
       } else if (multiCodeStatus == 'success') {
         navigate('/subcodes');
         dispatch(clearData());
+        toast.success('Subcodes Imported Successfully!')
       }
     }
   }
