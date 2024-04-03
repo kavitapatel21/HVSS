@@ -267,7 +267,6 @@ const Subcodes = () => {
                                             <img src={IcoMore} width={18} height={18} alt="More" />
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item href="/add-rules">Add rule</Dropdown.Item> 
                                             <Dropdown.Item href="#" onClick={() => handleEditPopup(subcode)}>Edit</Dropdown.Item> 
                                             <Dropdown.Item href="#" onClick={() => handleDeleteCode(subcode.id)}>Delete</Dropdown.Item> 
                                         </Dropdown.Menu>

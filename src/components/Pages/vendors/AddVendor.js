@@ -16,7 +16,7 @@ const AddVendor = ({ onClose }) => {
   }
 
   const formik = useFormik({
-    initialValues: { name: '' },
+    initialValues: { name: '', separator: '' },
     validate,
     onSubmit: async (values) => {
       try {
@@ -47,8 +47,16 @@ const AddVendor = ({ onClose }) => {
               />
               {formik.errors.name && formik.touched.name && <div className="error-message">{formik.errors.name}</div>}
             </div>
-        
-            
+            <div className='form-group mb-4'>
+              <label htmlFor="separator" className='label-title mb-2 d-block w-100 text-left'>Code Separator</label>
+              <input 
+              type="text"
+              name="separator"
+              placeholder="Code Separator"
+              value={formik.values.separator}
+              onChange={formik.handleChange}
+              />
+            </div>
             <div className="action-buttons">
                 <button type="submit" className='primary-button'>Add</button>
                 <button className='primary-button' onClick={onClose}>Cancel</button>

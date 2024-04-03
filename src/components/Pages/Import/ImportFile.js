@@ -32,13 +32,21 @@ const ImportFile = () => {
         if (selectedVendor != 0) {
             setIsLoading(true);
             const selectedFile = event.target.files[0];
-            setSelectedFileName(selectedFile.name);
-            let formData = new FormData();
+            if(selectedFile) {
+                if (selectedFile.type !== 'application/pdf') {
+                    setIsLoading(false);
+                    toast.error('Please select a PDF file.');
+                    event.target.value = ''; 
+                } else {
+                    setSelectedFileName(selectedFile.name);
+                    let formData = new FormData();
 
-            formData.append("file", selectedFile);
-            formData.append('vendor_id', selectedVendor);
-            dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
-            event.target.value = '';
+                    formData.append("file", selectedFile);
+                    formData.append('vendor_id', selectedVendor);
+                    dispatch(uploadDocumentAsync(formData)).finally(() => setIsLoading(false));
+                    event.target.value = '';
+                } 
+            }
         } else {
             event.target.value = '';
             toast.error('Please Select the Vendor.')
@@ -110,7 +118,7 @@ const ImportFile = () => {
                                         ))}
                                         <p className="regular-title">
                                             Drop file here or <span className="highlight position-relative c-pointer">
-                                                <input type="file" name="file" id="file_upload" accept=".pdf" onChange={handleFileChange} />browse</span>
+                                                <input type="file" name="file" id="file_upload" accept="application/pdf" onChange={handleFileChange} />browse</span>
                                         </p>
                                     </div>
                                 </div>

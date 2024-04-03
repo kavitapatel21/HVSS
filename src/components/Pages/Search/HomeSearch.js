@@ -29,36 +29,34 @@ const HomeSearch = () => {
     let callImport;
     useEffect(() => {
         dispatch(checkImportFile());
-       
-        if (fileReady == 'In-progress') {
-            callImport = setInterval(() => {
-                dispatch(checkImportFile());
-            }, 30000);
-        }
-
         if (searchQuery != '') {
             setIsLoading(true);
             dispatch(getCodeDetailsAsync(searchQuery))
                 .finally(() => setIsLoading(false));
         }
-        return () => clearInterval(callImport);
-        
-    }, [dispatch, searchQuery, fileReady]);
-
+    }, [dispatch, searchQuery]);
+    
+    useEffect(() => {
+        if (fileReady === 'In-progress') {
+            callImport = setInterval(() => {
+                dispatch(checkImportFile());
+            }, 30000);
+            return () => clearInterval(callImport);
+        }
+    }, [dispatch, fileReady]);
+    
     useEffect(() => {
         if (excelError) {
-          toast.error(excelError);
+            toast.error(excelError);
         }
-
-        if (checkFileStatus) {
-          setFileReady(checkFileStatus.status)
-          if (checkFileStatus.status == 'Ready') {
+    
+        if (checkFileStatus && checkFileStatus.status === 'Ready') {
+            setFileReady(checkFileStatus.status);
             clearInterval(callImport);
             setFileId(checkFileStatus.id);
             setFile(checkFileStatus.output_file);
-          }
         }
-      }, [excelError, checkFileStatus, importError]);
+    }, [excelError, checkFileStatus]);
     
 
     const handleSearch = (event) => {
@@ -94,9 +92,9 @@ const HomeSearch = () => {
     const pdfName = details && details[0] ? details[0].document.name : '';
     
     const handleFileInputChange = (event) => {
-        setFileReady('In-progress');
         const selectedFile = event.target.files[0];
         if (selectedFile) {
+            setFileReady('In-progress');
             if (selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||  // For .xlsx
                 selectedFile.type === 'application/vnd.ms-excel' ||  // For .xls
                 selectedFile.type === 'text/csv') { // For .csv

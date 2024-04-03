@@ -150,58 +150,6 @@ export const deleteSubCodeAsync = createAsyncThunk(
     }
 );
 
-export const listVendorAsync = createAsyncThunk(
-    'vendor/list',
-    async (arg, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await getAllVendors();
-            if (response.status === 200) {
-                return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllVendors();
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
-            } else {
-                return rejectWithValue(response);
-            }
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
-
-
-export const listDocAsync = createAsyncThunk(
-    'doc/list',
-    async (arg, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await getAllDocuments();
-            if (response.status === 200) {
-                return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllDocuments();
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
-            } else {
-                return rejectWithValue(response);
-            }
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
-
-
 export const subcodeSlice = createSlice({
     name: 'subcodes',
     initialState,
@@ -236,14 +184,6 @@ export const subcodeSlice = createSlice({
             })
             .addCase(updateSubCodeAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-            })
-            .addCase(listVendorAsync.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.vendors = action.payload.data.results;
-            })
-            .addCase(listDocAsync.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.documents = action.payload.data.results;  
             })
             .addCase(addMultipleCodeAsync.rejected, (state, action) => {
                 state.multiCodeStatus = 'failed';

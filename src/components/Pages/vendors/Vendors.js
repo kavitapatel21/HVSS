@@ -80,6 +80,7 @@ const Vendors = () => {
                             <tr>
                                 <th>Sr No.</th>
                                 <th>Name</th>
+                                <th>Code Seperator</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -89,6 +90,7 @@ const Vendors = () => {
                             <tr key={i}>
                                 <td>{i+1}</td>
                                 <td>{vendor.name}</td>
+                                <td>{vendor.separator}</td>
                                 <td>
                                     <Dropdown>
                                         <Dropdown.Toggle className="transparent-button" id="dropdown-basic">
