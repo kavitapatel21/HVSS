@@ -76,7 +76,6 @@ const ImportFile = () => {
     };
 
     useEffect(() => {
-        dispatch(clearData());
         const havingSubcodes = false;
         dispatch(listVendorsAsync(havingSubcodes));
         if (docData) {
@@ -90,6 +89,10 @@ const ImportFile = () => {
             }
         }
     }, [docData, extractData, tableData]);
+
+    useEffect(() => {
+        dispatch(clearData());
+    },[]);
 
     const getextractData = async () => {
         setIsLoading(true)

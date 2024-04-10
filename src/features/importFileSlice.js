@@ -90,7 +90,7 @@ export const importFileSlice = createSlice({
     reducers: {
         clearData: (state, action) => {
             state.formatedData = null;
-            state.extractData = null;
+            state.extractedData = null;
         },
     },
     extraReducers: (builder) => {

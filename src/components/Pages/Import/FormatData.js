@@ -270,6 +270,10 @@ const FormatData = () => {
     setIsAddPopupOpen(true);
   }
 
+  const handleBackClick = () => {
+    dispatch(clearData());
+  };
+
   return (
     <div className="d-flex">
       <Sidebar />
@@ -277,7 +281,7 @@ const FormatData = () => {
       <Header />
       <div className="common-layout">
         <div className="back-button mb-2">
-          <Link to="/import" className="back-link d-flex align-items-left">
+          <Link to="/import" onClick={handleBackClick} className="back-link d-flex align-items-left">
             <img src={Back} width={18} height={18} className="me-2" alt="Back" />
             Back
           </Link>

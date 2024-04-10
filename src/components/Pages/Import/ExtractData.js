@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import Loader from "../../loader";
 import { toast } from "react-toastify";
 import Back from "../../../assets/images/arrow-left-solid.svg"
+import { clearData } from "../../../features/importFileSlice";
  
 const ExtractData = () => {
     const location = useLocation();
@@ -45,7 +46,7 @@ const ExtractData = () => {
         updatedTables.splice(tableIndex, 1);
         setSelectedTables(updatedTables);
     };
-
+    
     const formatData = async () => {
         if (selectedTables.length > 0 ) {
             setIsLoading(true);
@@ -55,6 +56,10 @@ const ExtractData = () => {
         }
     }
 
+    const handleBackClick = () => {
+        dispatch(clearData());
+    };
+
     return (
       <div className="d-flex">
         <Sidebar />
@@ -63,7 +68,7 @@ const ExtractData = () => {
             <div className="common-layout">
                 <div className="extract-format">
                     <div className="back-button mb-2">
-                        <Link to="/import" className="back-link d-flex align-items-left">
+                        <Link to="/import" onClick={handleBackClick} className="back-link d-flex align-items-left">
                             <img src={Back} width={18} height={18} className="me-2" alt="Back" />
                             Back
                         </Link>
