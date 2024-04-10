@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import SubLoader from "../../inner_loader";
 import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
 import { toast } from 'react-toastify';
+import { clearData } from "../../../features/importFileSlice";
 
 const ImportFile = () => {
     const dispatch = useDispatch();
@@ -23,15 +24,36 @@ const ImportFile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const getAllVendors = useSelector(allVendors);
     const [selectedVendor, setSelectedVendor] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
 
     const handleVendorClick = (eventKey) => {
         setSelectedVendor(eventKey);
     };
-    
+
+    const handleDragEnter = (event) => {
+        event.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (event) => {
+        event.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
+
     const handleFileChange = (event) => {
+        event.preventDefault();
         if (selectedVendor != 0) {
             setIsLoading(true);
-            const selectedFile = event.target.files[0];
+            let selectedFile;
+            if (event.target.files) {
+                selectedFile = event.target.files[0];
+            } else if (event.dataTransfer && event.dataTransfer.files) {
+                selectedFile = event.dataTransfer.files[0];
+            }
             if(selectedFile) {
                 if (selectedFile.type !== 'application/pdf') {
                     setIsLoading(false);
@@ -54,6 +76,7 @@ const ImportFile = () => {
     };
 
     useEffect(() => {
+        dispatch(clearData());
         const havingSubcodes = false;
         dispatch(listVendorsAsync(havingSubcodes));
         if (docData) {
@@ -103,7 +126,8 @@ const ImportFile = () => {
                             </Dropdown>
                         </div>
                     <form>
-                        <div className="custom-file-upload">
+                        <div className="custom-file-upload" onDragEnter={handleDragEnter} onDragOver={handleDragOver}
+                            onDrop={handleFileChange}>
                             <div className="file-upload-box">
                                 <div className="input-box">
                                     <div className="file-information">

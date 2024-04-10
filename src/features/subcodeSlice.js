@@ -11,12 +11,14 @@ const initialState = {
     subcodes: null,
     totalPages: 1,
     currentPage: 1,
-    error: null,
+    addCodeError: null,
     vendors: null,
     documents: null,
     perPage: null,
     multiCodeStatus: null,
     addStatus: null,
+    updateCodeError: null,
+    updateCodeStatus: null,
 };
 
 export const listSubCodesAsync = createAsyncThunk(
@@ -77,7 +79,6 @@ export const addMultipleCodeAsync = createAsyncThunk(
     async (data, { dispatch, rejectWithValue }) => {
         try {
             const response = await createMultipleSubCode(data);
-            console.log(response);
             if (response.status === 200) {
                 return response.data; 
             } else if(response.response.status === 401) {
@@ -86,6 +87,8 @@ export const addMultipleCodeAsync = createAsyncThunk(
                 if (checkLoginResponse.payload) {
                     const check = await createMultipleSubCode(data);
                     return check.data;
+                } else if(response.response.status === 400) {
+                    return rejectWithValue(response.response.data);
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
                 }
@@ -107,7 +110,7 @@ export const updateSubCodeAsync = createAsyncThunk(
             const response = await updateSubCode(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
+            } else if(response.response && response.response.status === 401) {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
                 if (checkLoginResponse.payload) {
@@ -116,11 +119,13 @@ export const updateSubCodeAsync = createAsyncThunk(
                 } else {
                     return rejectWithValue(checkLoginResponse.error);
                 }
+            } else if(response.code == 400) {
+                return rejectWithValue(response.data);
             } else {
-                return rejectWithValue(response);
+                return rejectWithValue(response.data);
             }
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error);
         }
     }
 );
@@ -155,7 +160,7 @@ export const subcodeSlice = createSlice({
     initialState,
     reducers: {
         setCurrentPage: (state, action) => { // Add a reducer to update the currentPage
-            state.currentPage = 1;
+            state.currentPage = action.payload == 0 ? 1 : action.payload;
         },
         setTotalPages: (state, action) => { // Assuming you also have a reducer for totalPages
             state.totalPages = action.payload.data.count;
@@ -183,14 +188,22 @@ export const subcodeSlice = createSlice({
                 state.totalPages = Math.ceil(action.payload.data.count / 10);
             })
             .addCase(updateSubCodeAsync.fulfilled, (state, action) => {
-                state.status = 'succeeded';
+                state.updateCodeStatus = 'succeeded';
+            })
+            .addCase(updateSubCodeAsync.rejected, (state, action) => {
+                state.updateCodeStatus = 'failed';
+                if (action.payload) {
+                    state.updateCodeError = action.payload;
+                } else {
+                    state.updateCodeError = action.error.message;
+                }
             })
             .addCase(addMultipleCodeAsync.rejected, (state, action) => {
                 state.multiCodeStatus = 'failed';
                 if (action.payload) {
-                    state.error = action.payload.message;
+                    state.multiCodeError = action.payload.message;
                 } else {
-                    state.error = action.error.message; // Fallback to action.error.message if payload is not available
+                    state.multiCodeError = action.error.message; // Fallback to action.error.message if payload is not available
                 }
             })
             .addCase(addMultipleCodeAsync.fulfilled, (state, action) => {
@@ -200,9 +213,9 @@ export const subcodeSlice = createSlice({
             .addCase(addSubCodeAsync.rejected, (state, action) => {
                 state.addStatus = 'failed';
                 if (action.payload) {
-                    state.error = action.payload.data[0]['code_position'];
+                    state.addCodeError = action.payload.data[0]['code_position'];
                 } else {
-                    state.error = action.error.message; // Fallback to action.error.message if payload is not available
+                    state.addCodeError = action.error.message; // Fallback to action.error.message if payload is not available
                 }
             })
             .addCase(addSubCodeAsync.fulfilled, (state, action) => {
@@ -216,11 +229,14 @@ export const selectSubcodes = (state) => state.subcodes.subcodes;
 export const { setCurrentPage, setTotalPages } = subcodeSlice.actions;
 export const selectCurrentPage = state => state.subcodes.currentPage;
 export const totalPages = (state) => state.subcodes.totalPages;
-export const getError = (state) => state.subcodes.error;
+export const addError = (state) => state.subcodes.addCodeError;
 export const selectStatus = (state) => state.subcodes.status;
 export const allVendors = (state) => state.subcodes.vendors;
 export const allDocuments = (state) => state.subcodes.documents;
 export const count = (state) => state.subcodes.count;
 export const multipleCodeStatus = (state) => state.subcodes.multiCodeStatus;
 export const addCodeStatus = (state) => state.subcodes.addStatus;
+export const updateError = (state) => state.subcodes.updateCodeError;
+export const multiAddCodeError = (state) => state.subcodes.multiCodeError;
+export const updateStatus = (state) => state.subcodes.updateCodeStatus;
 export default subcodeSlice.reducer;

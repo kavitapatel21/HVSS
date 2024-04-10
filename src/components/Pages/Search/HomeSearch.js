@@ -37,7 +37,7 @@ const HomeSearch = () => {
     }, [dispatch, searchQuery]);
     
     useEffect(() => {
-        if (fileReady === 'In-progress') {
+        if (fileReady == 'In-progress') {
             callImport = setInterval(() => {
                 dispatch(checkImportFile());
             }, 30000);
@@ -50,14 +50,15 @@ const HomeSearch = () => {
             toast.error(excelError);
         }
     
-        if (checkFileStatus && checkFileStatus.status === 'Ready') {
+        if (checkFileStatus && checkFileStatus.status) {
             setFileReady(checkFileStatus.status);
-            clearInterval(callImport);
-            setFileId(checkFileStatus.id);
-            setFile(checkFileStatus.output_file);
+            if (checkFileStatus.status === 'Ready'){
+                clearInterval(callImport);
+                setFileId(checkFileStatus.id);
+                setFile(checkFileStatus.output_file);
+            }
         }
     }, [excelError, checkFileStatus]);
-    
 
     const handleSearch = (event) => {
         const query = event.target.value;
@@ -87,7 +88,7 @@ const HomeSearch = () => {
         anchor.href = url;
         anchor.download = filename;
         anchor.click();
-      };
+    };
 
     const pdfName = details && details[0] ? details[0].document.name : '';
     
@@ -130,6 +131,12 @@ const HomeSearch = () => {
                         <button className="primary-button ms-auto mb-3" onClick={downloadExcel}>Download Excel</button>
                     )}
                 </div>
+                {(fileReady === 'In-progress' || fileReady === 'Ready') && (
+                    <div className="mb-3 file-status">
+                        <strong>{fileReady === 'In-progress' && 'We are Processing the file...'}</strong>
+                        <strong>{fileReady === 'Ready' && 'We are done'}</strong>
+                    </div>
+                )}
                 <div className="table-wrapper py-4">
                     <div className="search-data mx-auto">
                         <div className="table-search px-0">

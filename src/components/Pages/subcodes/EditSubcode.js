@@ -33,7 +33,6 @@ const EditSubcode = ({ rowData, onSave, onClose, vendors, documents }) => {
       try {
         await dispatch(updateSubCodeAsync(values));
         onClose(); // Close the popup after submission
-        toast.success('Subcode updated Successfully!')
       } catch (error) {
         toast.error(error)
         console.error('An error occurred:', error);

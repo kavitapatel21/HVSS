@@ -1,7 +1,7 @@
 import Sidebar from "../../Layout/Sidebar";
 import Header from "../../Layout/Header"; 
 import "../../../assets/scss/import.scss" 
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import TableComponent from "./Table";
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import { formatDataAsync, formatedData } from "../../../features/importFileSlice
 import { useNavigate } from 'react-router-dom';
 import Loader from "../../loader";
 import { toast } from "react-toastify";
+import Back from "../../../assets/images/arrow-left-solid.svg"
  
 const ExtractData = () => {
     const location = useLocation();
@@ -59,8 +60,14 @@ const ExtractData = () => {
         <Sidebar />
         <div className="page-wrapper">         
             <Header />
-            <div className="common-layout"> 
+            <div className="common-layout">
                 <div className="extract-format">
+                    <div className="back-button mb-2">
+                        <Link to="/import" className="back-link d-flex align-items-left">
+                            <img src={Back} width={18} height={18} className="me-2" alt="Back" />
+                            Back
+                        </Link>
+                    </div>
                     <div className="d-flex align-items-center">
                         <h2 className="page-title mb-0">Extracted Data</h2>  
                         <button className="primary-button ms-auto" onClick={formatData}>Format Data</button> 

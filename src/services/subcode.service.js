@@ -69,7 +69,8 @@ export const createMultipleSubCode = (data) => {
 export const updateSubCode = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     data.document_id = data.document_id.id;
-    return API.patch("product_subcodes/"+ data.id , data, {
+    const { vendor_id, ...newdata } = data;
+    return API.patch("product_subcodes/"+ newdata.id , newdata, {
         headers:{
             'Authorization': `Bearer ${auth.access}`
         }

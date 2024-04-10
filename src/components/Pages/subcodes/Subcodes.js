@@ -7,8 +7,8 @@ import IcoSearch from "../../../assets/images/search_ico.svg";
 import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { selectSubcodes, listSubCodesAsync, selectCurrentPage, 
-    count, setCurrentPage, selectStatus, getError,
-    deleteSubCodeAsync, addStatus, addCodeStatus } from "../../../features/subcodeSlice";
+    count, setCurrentPage, selectStatus, addError,
+    deleteSubCodeAsync, addStatus, addCodeStatus, updateError, updateStatus, multiAddCodeError} from "../../../features/subcodeSlice";
 import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
 import { listDocAsync, allDocuments } from "../../../features/documentSlice";
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,7 +30,8 @@ const Subcodes = () => {
     const [totalPage, setTotalPages] = useState(0);
     const currentPage = useSelector(selectCurrentPage);
     const status = useSelector(selectStatus);
-    const errorMessage = useSelector(getError);
+    const errorMessage = useSelector(addError);
+    const multiCodeError = useSelector(multiAddCodeError);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +48,9 @@ const Subcodes = () => {
     const [sortColumn, setSortColumn] = useState(null);
     const [sortDirection, setSortDirection] = useState('asc');
     const [order, setOrder] = useState(null);
-    const addSubcodeStatus = useSelector(addCodeStatus)
+    const addSubcodeStatus = useSelector(addCodeStatus);
+    const updateCodeError = useSelector(updateError);
+    const updateCodeStatus = useSelector(updateStatus);
 
     const handleSort = (column) => {
         const newDirection = column === sortColumn && sortDirection === 'asc' ? 'desc' : 'asc';
@@ -61,10 +64,6 @@ const Subcodes = () => {
     useEffect(() => {
         if (!isAddPopupOpen || !isPopupOpen) {
             dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}));
-            if(status == 'failed') {
-                toast.error(errorMessage);
-                navigate('/login');
-            }
             if (authUser && authUser.user.role == 'admin') {
                 const allVendor = true;
                 dispatch(listVendorsAsync(allVendor));
@@ -73,14 +72,42 @@ const Subcodes = () => {
             dispatch(listDocAsync(havingSubcodes));
             const pages = Math.ceil(getcount / perPage);
             setTotalPages(pages);
+        }
+    }, [dispatch, currentPage, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount, order]);
 
-            if (addSubcodeStatus == 'failed') {
-                toast.error('Code Position should be a valid integer.')
-            } else if (addSubcodeStatus == 'success') { 
-                toast.success('Subcode Added Successfully !')
+    useEffect(() => {
+        if (addSubcodeStatus === 'failed') {
+            toast.error('Code Position should be a valid integer.');
+        } else if (addSubcodeStatus === 'success') { 
+            toast.success('Subcode Added Successfully !');
+        }
+    }, [addSubcodeStatus]);
+
+    useEffect(() => {
+        if(updateCodeError) {
+            if (updateCodeError.code_position) {
+                toast.error('Code Position should be valid integer.');
             }
         }
-    }, [dispatch, currentPage, errorMessage, status, addSubcodeStatus, searchQuery, isPopupOpen, selectedDoc, selectedVendor, perPage, getcount, order]);
+    }, [updateCodeError]);
+
+    useEffect(() => {
+        if (updateCodeStatus === 'succeeded') {
+            toast.success('Subcode updated Successfully!')
+        }
+    }, [updateCodeStatus]);
+
+    useEffect(() => {
+        if (errorMessage) {
+            toast.error(errorMessage);
+        }
+    }, [errorMessage]);
+
+    useEffect(() => {
+        if (multiCodeError) {
+            toast.error(multiCodeError);
+        }
+    }, [multiCodeError]);
 
     const getAllVendors = useSelector(allVendors);
     const getAllDocs = useSelector(allDocuments);
@@ -118,7 +145,8 @@ const Subcodes = () => {
           true,
           async () => {
             await dispatch(deleteSubCodeAsync(code));
-            dispatch(listSubCodesAsync({ currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order }));
+            dispatch(setCurrentPage(1));
+            dispatch(listSubCodesAsync({ currentPage: 1, searchQuery, selectedVendor, selectedDoc, perPage, order }));
             toast.success('Subcode Deleted Successfully!');
         }
         );
@@ -297,6 +325,7 @@ const Subcodes = () => {
                     activeClassName={'active'}
                     previousLabel={'Previous'}
                     nextLabel={'Next'}
+                    forcePage={currentPage - 1}
                 />
             </div>
         </div>

@@ -401,5 +401,14 @@ button{
     position: sticky;
     top: 68px;
     z-index: 9;
-    padding: 5px 10px 5px;
+    padding: 5px 1px 5px;
+}
+.file-status{
+    color: red;
+}
+.back-button{
+    .back-link{
+        color: #9d9d9d;
+        line-height: normal;
+    }
 }

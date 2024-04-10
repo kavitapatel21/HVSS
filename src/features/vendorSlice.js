@@ -15,7 +15,6 @@ export const listVendorsAsync = createAsyncThunk(
     'vendor/list',
     async (allvendor, { dispatch, rejectWithValue }) => {
         try {
-            console.log(allvendor);
             const response = await getAllVendors(allvendor);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data

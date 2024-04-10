@@ -1,7 +1,7 @@
 import Sidebar from "../../Layout/Sidebar";
 import Header from "../../Layout/Header"; 
 import "../../../assets/scss/import.scss" 
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import CancelRecord from "../../../assets/images/trash.svg"
 import EditRecord from "../../../assets/images/edit.svg"
@@ -15,6 +15,7 @@ import { clearData } from "../../../features/importFileSlice";
 import Swal from 'sweetalert2'
 import Addrule from "../../../assets/images/add-rule.svg";
 import { toast } from "react-toastify";
+import Back from "../../../assets/images/arrow-left-solid.svg"
 
 const FormatData = () => {
   const location = useLocation();
@@ -36,7 +37,49 @@ const FormatData = () => {
   const [rowIndex, setRowIndex] = useState(0);
   const [actionStack, setActionStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
   const multiCodeStatus = useSelector(multipleCodeStatus);
+
+  const handleSort = (column) => {
+    const newDirection = column === sortColumn && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortColumn(column);
+    if (newDirection == 'asc') {
+      const asc = data.slice().sort(customSort);
+      setData(asc);
+    } else {
+      const desc =  data.slice().sort((a, b) => customSort(b, a));
+      setData(desc);
+    }
+    
+    setSortDirection(newDirection);
+  };
+
+  const customSort = (a, b) => {
+    const getValue = (entry) => {
+      let index = 0;
+      if (sortColumn == 'description') { index = 1;}
+      else if (sortColumn == 'code') { index = 2; }
+      const value = entry[index];
+      return isNaN(value) ? value : parseInt(value);
+    };
+  
+    const valueA = getValue(a);
+    const valueB = getValue(b);
+  
+    if (valueA === valueB) {
+      return a[1].localeCompare(b[1]);
+    }
+  
+    if (typeof valueA === 'number' && typeof valueB !== 'number') {
+      return -1;
+    }
+    if (typeof valueA !== 'number' && typeof valueB === 'number') {
+      return 1;
+    }
+  
+    return valueA < valueB ? -1 : 1;
+  };
 
   const editRecord = (row) => {
     setRowIndex(row);
@@ -173,13 +216,38 @@ const FormatData = () => {
   useEffect(() => {
     const { formattedData, docId } = location.state;
     if (formattedData) {
-      setData(formattedData.data);
+      const getArrangedData = arrangeData(formattedData.data)
+      setData(getArrangedData);
     }
   
     if (docId) {
       setDocument(docId)
     }
-  }, [location.state, dispatch]);
+    
+  }, [location.state, dispatch, sortColumn]);
+
+  useEffect(() => {
+    if (multiCodeStatus == 'failed') {
+      toast.error('Please Enter Valid Data. Code Position should be Integer, Description & Code should be String.')
+    } else if (multiCodeStatus == 'success') {
+      navigate('/subcodes');
+      dispatch(clearData());
+      toast.success('Subcodes Imported Successfully!')
+    }
+  }, [multiCodeStatus])
+
+  const arrangeData = (data) => {
+    let lastNonEmptyValue = "";
+    data.map(arr => {
+      if (arr[0].trim() !== "") {
+        lastNonEmptyValue = arr[0];
+      } else {
+        arr[0] = lastNonEmptyValue;
+      }
+      return arr;
+    });
+    return data;
+  }
     
   const savesubcode = async () => {
     const reformatData = data.map((record) => ({
@@ -195,13 +263,6 @@ const FormatData = () => {
     } else {
       reformatData.filter((record) => record.code.trim() !== '');
       await dispatch(addMultipleCodeAsync(reformatData));
-      if (multiCodeStatus == 'failed') {
-        toast.error('Please Enter Valid Data. Code Position should be Integer, Description & Code should be String.')
-      } else if (multiCodeStatus == 'success') {
-        navigate('/subcodes');
-        dispatch(clearData());
-        toast.success('Subcodes Imported Successfully!')
-      }
     }
   }
 
@@ -215,8 +276,14 @@ const FormatData = () => {
       <div className="page-wrapper">         
       <Header />
       <div className="common-layout">
+        <div className="back-button mb-2">
+          <Link to="/import" className="back-link d-flex align-items-left">
+            <img src={Back} width={18} height={18} className="me-2" alt="Back" />
+            Back
+          </Link>
+        </div>
         <div className="d-md-flex align-items-center justify-content-between mb-4">
-        <h2 className="page-title mb-0">Formatted Data</h2>
+          <h2 className="page-title mb-0">Formatted Data</h2>
           <div className="new-addition d-flex align-items-center">
             <a onClick={addSubcode} className="new-record">
               <img src={Addrule} width={18} height={18} className="me-3" alt="Add Record" />
@@ -234,9 +301,17 @@ const FormatData = () => {
             <thead>
                 <tr>
                   {/* <th className="text-center">Sr No.</th> */}
-                  <th>Code Position</th>
-                  <th>Description</th>
-                  <th>Code</th>
+                  <th onClick={() => handleSort('code_position')}>
+                    Code Position {sortColumn === 'code_position' && (
+                    <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </th>
+                  <th onClick={() => handleSort('description')}>Description {sortColumn === 'description' && (
+                    <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                    )}</th>
+                  <th  onClick={() => handleSort('code')}>Code {sortColumn === 'code' && (
+                    <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                    )}</th>
                   <th colSpan={2}>Actions</th>
                 </tr>
             </thead>
@@ -295,7 +370,7 @@ const FormatData = () => {
                   />
                 </div>
                 <div className="action-buttons">
-                  <button type="submit" className='primary-button'>Edit</button>
+                  <button type="submit" className='primary-button'>Save</button>
                   <button className='primary-button' onClick={closePopup}>Cancel</button>
                 </div>
               </form>
