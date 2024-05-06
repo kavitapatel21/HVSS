@@ -11,6 +11,7 @@ import Loader from "../../loader";
 import { toast } from "react-toastify";
 import Back from "../../../assets/images/arrow-left-solid.svg"
 import { clearData } from "../../../features/importFileSlice";
+import Table from 'react-bootstrap/Table';
  
 const ExtractData = () => {
     const location = useLocation();
@@ -48,12 +49,14 @@ const ExtractData = () => {
     };
     
     const formatData = async () => {
-        if (selectedTables.length > 0 ) {
-            setIsLoading(true);
-            await dispatch(formatDataAsync(selectedTables)).finally(() => setIsLoading(false));
-        } else {
-            toast.error('Please select atleast one table to format!')
-        }
+        // if (selectedTables.length > 0 ) {
+        //     setIsLoading(true);
+        //     await dispatch(formatDataAsync(selectedTables)).finally(() => setIsLoading(false));
+        // } else {
+        //     toast.error('Please select atleast one table to format!')
+        // }
+        setIsLoading(true);
+        await dispatch(formatDataAsync(selectedTables)).finally(() => setIsLoading(false));
     }
 
     const handleBackClick = () => {
@@ -94,7 +97,15 @@ const ExtractData = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="d-flex"><p>No tables found.</p></div>
+                    <div className="d-flex">
+                        <Table striped bordered >
+                            <tbody>
+                                <tr>
+                                    <td colSpan="3" className="text-center">No data found. Please go to Format Data and add data manually.</td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                    </div>
                 )}
                 </div>
             </div>

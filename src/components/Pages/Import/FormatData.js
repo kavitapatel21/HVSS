@@ -8,10 +8,9 @@ import EditRecord from "../../../assets/images/edit.svg"
 import { Modal } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMultipleCodeAsync, multipleCodeStatus } from "../../../features/subcodeSlice";
 import { useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
-import { clearData } from "../../../features/importFileSlice";
+import { clearData, addMultipleCodeAsync, multipleCodeStatus, resetMultiCodeStatus } from "../../../features/importFileSlice";
 import Swal from 'sweetalert2'
 import Addrule from "../../../assets/images/add-rule.svg";
 import { toast } from "react-toastify";
@@ -227,14 +226,17 @@ const FormatData = () => {
   }, [location.state, dispatch, sortColumn]);
 
   useEffect(() => {
-    if (multiCodeStatus == 'failed') {
+    if (multiCodeStatus === 'failed') {
       toast.error('Please Enter Valid Data. Code Position should be Integer, Description & Code should be String.')
-    } else if (multiCodeStatus == 'success') {
+    } 
+    
+    if(multiCodeStatus === 'success') {
       navigate('/subcodes');
       dispatch(clearData());
       toast.success('Subcodes Imported Successfully!')
     }
-  }, [multiCodeStatus])
+    dispatch(resetMultiCodeStatus());
+  }, [multiCodeStatus, dispatch, navigate])
 
   const arrangeData = (data) => {
     let lastNonEmptyValue = "";
@@ -250,19 +252,27 @@ const FormatData = () => {
   }
     
   const savesubcode = async () => {
-    const reformatData = data.map((record) => ({
-      code_position: record[0],
-      description: record[1],
-      code: record[2],
-      document_id: document,
-    }));
-    
-    const hasEmptyFields = reformatData.some(record => record.code.trim() == '');
-    if (hasEmptyFields) {
-      toast.error('Some records have empty code. Please check and edit them!')
+    if (data.length > 0) {
+      const reformatData = data.map((record) => ({
+        code_position: record[0],
+        description: record[1],
+        code: record[2],
+        document_id: document,
+      }));
+      
+      const hasEmptyFields = reformatData.some(record => record.code.trim() == '');
+      if (hasEmptyFields) {
+        toast.error('Some records have empty code. Please check and edit them!');
+      } else {
+          const nonEmptyRecords = reformatData.filter(record => record.code.trim() !== '');
+          if (nonEmptyRecords.length === 0) {
+              toast.error('All records have empty codes. Please check and edit them!');
+          } else {
+              await dispatch(addMultipleCodeAsync(nonEmptyRecords));
+          }
+      }
     } else {
-      reformatData.filter((record) => record.code.trim() !== '');
-      await dispatch(addMultipleCodeAsync(reformatData));
+      toast.error('Please add atleast one record!')
     }
   }
 
@@ -313,7 +323,7 @@ const FormatData = () => {
                   <th onClick={() => handleSort('description')}>Description {sortColumn === 'description' && (
                     <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}</th>
-                  <th  onClick={() => handleSort('code')}>Code {sortColumn === 'code' && (
+                  <th onClick={() => handleSort('code')}>Code {sortColumn === 'code' && (
                     <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}</th>
                   <th colSpan={2}>Actions</th>

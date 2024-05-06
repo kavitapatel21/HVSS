@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { getAllDocuments } from "../services/document.service";
-import { checkLoginAsync } from "./loginSlice";
 
 const initialState = {
     status: null,
@@ -18,15 +17,6 @@ export const listDocAsync = createAsyncThunk(
             const response = await getAllDocuments(allDocument);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllDocuments(allDocument);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }

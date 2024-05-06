@@ -13,7 +13,7 @@ export default configureStore({
         subcodes: subcodeReducer,
         codeDetails: codeReducer,
         users: userReducer,
-        extractedData: importReducer,
+        extractImportedData: importReducer,
         vendors: vendorReducer,
         documents: documentReducer,
     },

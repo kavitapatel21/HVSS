@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { getAllVendors, addVendor, updateVendor, deleteVendor } from "../services/vendor.service";
-import { checkLoginAsync } from "./loginSlice";
 
 const initialState = {
     status: null,
@@ -18,15 +17,6 @@ export const listVendorsAsync = createAsyncThunk(
             const response = await getAllVendors(allvendor);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllVendors(allvendor);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -43,15 +33,6 @@ export const addVendorAsync = createAsyncThunk(
             const response = await addVendor(data);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await addVendor(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -68,15 +49,6 @@ export const updateVendorAsync = createAsyncThunk(
             const response = await updateVendor(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await updateVendor(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -103,7 +75,7 @@ export const deleteVendorAsync = createAsyncThunk(
 );
 
 export const vendorSlice = createSlice({
-    name: 'users',
+    name: 'vendors',
     initialState,
     reducers: {},
     extraReducers: (builder) => {

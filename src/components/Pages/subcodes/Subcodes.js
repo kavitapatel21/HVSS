@@ -8,7 +8,8 @@ import { Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { selectSubcodes, listSubCodesAsync, selectCurrentPage, 
     count, setCurrentPage, selectStatus, addError,
-    deleteSubCodeAsync, addStatus, addCodeStatus, updateError, updateStatus, multiAddCodeError} from "../../../features/subcodeSlice";
+    deleteSubCodeAsync, addStatus, addCodeStatus, updateError, updateStatus} from "../../../features/subcodeSlice";
+import { multiAddCodeError  } from "../../../features/importFileSlice";
 import { listVendorsAsync, allVendors } from "../../../features/vendorSlice";
 import { listDocAsync, allDocuments } from "../../../features/documentSlice";
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,14 +61,12 @@ const Subcodes = () => {
         setOrder(order);
         dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}))
     };
-
+   
     useEffect(() => {
         if (!isAddPopupOpen || !isPopupOpen) {
             dispatch(listSubCodesAsync({currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order}));
-            if (authUser && authUser.user.role == 'admin') {
-                const allVendor = true;
-                dispatch(listVendorsAsync(allVendor));
-            }
+            const allVendor = true;
+            dispatch(listVendorsAsync(allVendor));
             const havingSubcodes = true;
             dispatch(listDocAsync(havingSubcodes));
             const pages = Math.ceil(getcount / perPage);

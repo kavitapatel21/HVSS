@@ -82,17 +82,20 @@ const ImportFile = () => {
             setExtractData(true);
         }
         if (tableData) {
-            if (tableData.length > 0) {
-                navigate('/extract', { state: {data: tableData, document_id:docData.id } });
-            } else {
-                toast.error('No Tables Found in the Imported PDF.')
-            }
+            navigate('/extract', { state: {data: tableData, document_id:docData.id } });
+            // if (tableData.length > 0) {
+            //     navigate('/extract', { state: {data: tableData, document_id:docData.id } });
+            // }
+            // else {
+            //     toast.error('No Tables Found in the Imported PDF.')
+            // }
         }
     }, [docData, extractData, tableData]);
 
     useEffect(() => {
         dispatch(clearData());
-    },[]);
+        setExtractData(false);
+    },[dispatch]);
 
     const getextractData = async () => {
         setIsLoading(true)

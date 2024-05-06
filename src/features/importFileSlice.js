@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { checkLoginAsync } from "../features/loginSlice";
 import { uploadDocument, extractData, getformatData } from "../services/document.service";
+import { createMultipleSubCode } from "../services/subcode.service";
 
 const initialState = {
     status: null,
     message: null,
     error: null,
     documentData: null,
+    multiCodeError: null,
+    multiCodeStatus: null
 };
 
 export const uploadDocumentAsync = createAsyncThunk(
@@ -16,15 +18,6 @@ export const uploadDocumentAsync = createAsyncThunk(
             const response = await uploadDocument(file);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await uploadDocument(file);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -41,15 +34,6 @@ export const getExtractDataAsync = createAsyncThunk(
             const response = await extractData(doc_id);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await extractData(doc_id);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -66,15 +50,6 @@ export const formatDataAsync = createAsyncThunk(
             const response = await getformatData(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getformatData(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -84,13 +59,35 @@ export const formatDataAsync = createAsyncThunk(
     }
 );
 
-export const importFileSlice = createSlice({
-    name: 'extractedData',
+export const addMultipleCodeAsync = createAsyncThunk(
+    'subcodes/multicreate',
+    async (data, { dispatch, rejectWithValue }) => {
+        try {
+            const response = await createMultipleSubCode(data);
+            if (response.status === 200) {
+                return response.data; 
+            } else if(response.response.status === 400) {
+                return rejectWithValue(response.response.data);
+            } else {
+                return rejectWithValue(response);
+            }
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+const importFileSlice = createSlice({
+    name: 'extractImportedData',
     initialState,
     reducers: {
         clearData: (state, action) => {
             state.formatedData = null;
             state.extractedData = null;
+        },
+        resetMultiCodeStatus: (state) => {
+            state.multiCodeStatus = null;
+            state.multiCodeError = null;
         },
     },
     extraReducers: (builder) => {
@@ -114,15 +111,27 @@ export const importFileSlice = createSlice({
             })
             .addCase(formatDataAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                console.log(action.payload.data);
                 state.formatedData = action.payload.data;
+            })
+            .addCase(addMultipleCodeAsync.rejected, (state, action) => {
+                state.multiCodeStatus = 'failed';
+                if (action.payload) {
+                    state.multiCodeError = action.payload.message;
+                } else {
+                    state.multiCodeError = action.error.message; // Fallback to action.error.message if payload is not available
+                }
+            })
+            .addCase(addMultipleCodeAsync.fulfilled, (state, action) => {
+                state.multiCodeStatus = 'success';
             })
     },
 });
 
-export const { clearData } = importFileSlice.actions;
-export const documentData = (state) => state.extractedData.documentData;
-export const extractedData = (state) => state.extractedData.extractedData;
-export const extractedStatus = (state) => state.extractedData.status;
-export const formatedData = (state) => state.extractedData.formatedData;
+export const { clearData, resetMultiCodeStatus } = importFileSlice.actions;
+export const documentData = (state) => state.extractImportedData.documentData;
+export const extractedData = (state) => state.extractImportedData.extractedData;
+export const extractedStatus = (state) => state.extractImportedData.status;
+export const formatedData = (state) => state.extractImportedData.formatedData;
+export const multipleCodeStatus = (state) => state.extractImportedData.multiCodeStatus;
+export const multiAddCodeError = (state) => state.extractImportedData.multiCodeError;
 export default importFileSlice.reducer;

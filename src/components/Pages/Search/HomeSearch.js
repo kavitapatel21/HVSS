@@ -56,9 +56,13 @@ const HomeSearch = () => {
                 clearInterval(callImport);
                 setFileId(checkFileStatus.id);
                 setFile(checkFileStatus.output_file);
+                if (importError) {
+                    setFileReady('Downloaded');
+                    dispatch(dwnldFileAsync(checkFileStatus.id));
+                }
             }
         }
-    }, [excelError, checkFileStatus]);
+    }, [excelError, checkFileStatus, importError, dispatch]);
 
     const handleSearch = (event) => {
         const query = event.target.value;
@@ -72,12 +76,8 @@ const HomeSearch = () => {
 
     const downloadExcel = () => {
         setFileReady('Downloaded');
-        if(importError) {
-            toast.error(importError);
-        } else {
-            const filename = file.substring(file.lastIndexOf('/') + 1);
-            downloadFile(file, filename);
-        }
+        const filename = file.substring(file.lastIndexOf('/') + 1);
+        downloadFile(file, filename);
         if (fileReady && fileId != 0) {
             dispatch(dwnldFileAsync(fileId));
         }
@@ -131,10 +131,16 @@ const HomeSearch = () => {
                         <button className="primary-button ms-auto mb-3" onClick={downloadExcel}>Download Excel</button>
                     )}
                 </div>
-                {(fileReady === 'In-progress' || fileReady === 'Ready') && (
+                {(fileReady === 'In-progress' || fileReady === 'Ready' || fileReady === 'Downloaded') && (
                     <div className="mb-3 file-status">
                         <strong>{fileReady === 'In-progress' && 'We are Processing the file...'}</strong>
                         <strong>{fileReady === 'Ready' && 'We are done'}</strong>
+                        <strong>{fileReady === 'Downloaded' && importError && (
+                            <>
+                            {importError}
+                            </>
+                        )}
+                        </strong>
                     </div>
                 )}
                 <div className="table-wrapper py-4">

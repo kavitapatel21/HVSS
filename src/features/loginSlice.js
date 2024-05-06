@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { login, checkLogin } from "../services/auth.service";
+import { login, checkLogin, loggedOut } from "../services/auth.service";
+import { useNavigate } from 'react-router-dom';
 
 export const loginAsync = createAsyncThunk(
     'login/login',
@@ -24,13 +25,25 @@ export const checkLoginAsync = createAsyncThunk(
     async (refreshToken, { rejectWithValue }) => {
       try {
         const response = await checkLogin(refreshToken);
+        console.log(response);
         if (response.status === 200) {
             const user = JSON.parse(localStorage.getItem('user'));
             user.access = response.data.data.access_token;
             localStorage.setItem('user', JSON.stringify(user));
             return response.data;
         } else {
-          return rejectWithValue(response.data); 
+            if (response.response.status == 400) {
+                
+                const logoutResponse = await loggedOut(refreshToken);
+                if (logoutResponse.status) {
+                    
+                    let navigate = useNavigate();
+                    navigate('/login');
+                    console.log('Hii')
+                }
+            } else {
+                return rejectWithValue(response.data);
+            } 
         }
       } catch (error) {
         return rejectWithValue(error.message);

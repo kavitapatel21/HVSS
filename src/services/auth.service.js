@@ -22,3 +22,16 @@ export const checkLogin = (token) => {
         return error; 
     })
 }
+
+export const loggedOut = (token) => {
+    const data = {
+        'refresh_token' : token
+    };
+    return API.post("logout", data)
+    .then(response => {
+        return response.data;
+    },
+    error => {
+        return error; 
+    })
+}

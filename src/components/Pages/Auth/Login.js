@@ -98,9 +98,9 @@ export function Login() {
                 Login
               </button>
             </div>
-            <div className='text-center'>
+            {/* <div className='text-center'>
               <span className='regular-title c-pointer'>New user? <Link to="/register" className='highlight'>Create account</Link></span>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

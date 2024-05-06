@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getCodeDetails, uploadExcel, getImportFileStatus, getFileDownload } from "../services/homesearch.service";
-import { checkLoginAsync } from "../features/loginSlice";
 
 const initialState = {
     status: null,
@@ -8,6 +7,7 @@ const initialState = {
     details: null,
     document: null,
     excelError: null,
+    uploadError: null,
 };
 
 export const getCodeDetailsAsync = createAsyncThunk(
@@ -17,15 +17,6 @@ export const getCodeDetailsAsync = createAsyncThunk(
             const response = await getCodeDetails(code);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getCodeDetails(code);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -42,16 +33,7 @@ export const uploadExcelAsync = createAsyncThunk(
             const response = await uploadExcel(file);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await uploadExcel(file);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
-            }  else if(response.response.status === 400) {
+            } else if(response.response.status === 400) {
                 return rejectWithValue(response.response.data.data);
             } else {
                 return rejectWithValue(response);
@@ -69,15 +51,6 @@ export const checkImportFile = createAsyncThunk(
             const response = await getImportFileStatus();
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getImportFileStatus();
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -95,15 +68,6 @@ export const dwnldFileAsync = createAsyncThunk(
             console.log(response);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getFileDownload(fileId);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -113,7 +77,7 @@ export const dwnldFileAsync = createAsyncThunk(
     }
 )
 
-export const subcodeSlice = createSlice({
+export const homeSearchSlice = createSlice({
     name: 'codeDetails',
     initialState,
     reducers: {},
@@ -149,8 +113,8 @@ export const subcodeSlice = createSlice({
             })
             .addCase(checkImportFile.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.checkStatus = action.payload.data[0];
-                state.uploadError = action.payload.data[0].error_message;
+                state.checkStatus = action.payload.data ? action.payload.data[0] : '';
+                state.uploadError = action.payload.data ? action.payload.data[0].error_message : '';
             })
     },
 });
@@ -161,4 +125,4 @@ export const responseExcel = (state) => state.codeDetails.document;
 export const responseExcelError = (state) => state.codeDetails.excelError;
 export const checkImportFileStatus = (state) => state.codeDetails.checkStatus;
 export const importFileError = (state) => state.codeDetails.uploadError;
-export default subcodeSlice.reducer;
+export default homeSearchSlice.reducer;

@@ -9,11 +9,15 @@ export const getAllUsers = () => {
     };
     return API.get("user", config)
         .then(response => { 
-            return response; 
-        },
-        error => { 
-            return error; 
+            if (response.status == 200) {
+                return response;
+            } else {
+                return Promise.reject(response);
+            }
         })
+        .catch(error => {
+            return Promise.reject(error);
+        });
 }
 
 export const addUser = (data) => {

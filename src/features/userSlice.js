@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { getAllUsers, addUser, updateUser, deleteUser } from "../services/user.service";
-import { checkLoginAsync } from "./loginSlice";
 
 const initialState = {
     status: null,
@@ -16,17 +15,9 @@ export const listUsersAsync = createAsyncThunk(
     async (arg, { dispatch, rejectWithValue }) => {
         try {
             const response = await getAllUsers();
+            console.log(response)
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllUsers();
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -43,15 +34,6 @@ export const addUserAsync = createAsyncThunk(
             const response = await addUser(data);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await addUser(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -68,15 +50,6 @@ export const updateUserAsync = createAsyncThunk(
             const response = await updateUser(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await updateUser(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }

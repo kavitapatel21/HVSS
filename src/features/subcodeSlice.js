@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { getAllSubCodes, createSubCode, updateSubCode, getAllVendors, 
-    getAllDocuments, deleteSubCode, createMultipleSubCode } from "../services/subcode.service";
-import { checkLoginAsync } from "../features/loginSlice";
+import { getAllSubCodes, createSubCode, updateSubCode, 
+        deleteSubCode } from "../services/subcode.service";
 
 const initialState = {
     status: null,
@@ -29,15 +28,6 @@ export const listSubCodesAsync = createAsyncThunk(
             const response = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await getAllSubCodes(currentPage, searchQuery, selectedVendor, selectedDoc, perPage, order);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -54,15 +44,6 @@ export const addSubCodeAsync = createAsyncThunk(
             const response = await createSubCode(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await createSubCode(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else if(response.response.status === 400) {
                 return rejectWithValue(response.response.data);
             } else {
@@ -74,35 +55,6 @@ export const addSubCodeAsync = createAsyncThunk(
     }
 );
 
-export const addMultipleCodeAsync = createAsyncThunk(
-    'subcodes/multicreate',
-    async (data, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await createMultipleSubCode(data);
-            if (response.status === 200) {
-                return response.data; 
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await createMultipleSubCode(data);
-                    return check.data;
-                } else if(response.response.status === 400) {
-                    return rejectWithValue(response.response.data);
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
-            } else {
-                return rejectWithValue(response);
-            }
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
-
-
-
 export const updateSubCodeAsync = createAsyncThunk(
     'subcodes/post',
     async (data, { dispatch, rejectWithValue }) => {
@@ -110,15 +62,6 @@ export const updateSubCodeAsync = createAsyncThunk(
             const response = await updateSubCode(data);
             if (response.status === 200) {
                 return response.data; 
-            } else if(response.response && response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await updateSubCode(data);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else if(response.code == 400) {
                 return rejectWithValue(response.data);
             } else {
@@ -137,15 +80,6 @@ export const deleteSubCodeAsync = createAsyncThunk(
             const response = await deleteSubCode(codeId);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const checkLoginResponse = await dispatch(checkLoginAsync(user.refresh));
-                if (checkLoginResponse.payload) {
-                    const check = await deleteSubCode(codeId);
-                    return check.data;
-                } else {
-                    return rejectWithValue(checkLoginResponse.error);
-                }
             } else {
                 return rejectWithValue(response);
             }
@@ -198,18 +132,6 @@ export const subcodeSlice = createSlice({
                     state.updateCodeError = action.error.message;
                 }
             })
-            .addCase(addMultipleCodeAsync.rejected, (state, action) => {
-                state.multiCodeStatus = 'failed';
-                if (action.payload) {
-                    state.multiCodeError = action.payload.message;
-                } else {
-                    state.multiCodeError = action.error.message; // Fallback to action.error.message if payload is not available
-                }
-            })
-            .addCase(addMultipleCodeAsync.fulfilled, (state, action) => {
-                state.multiCodeStatus = 'success';
-                console.log(action);
-            })
             .addCase(addSubCodeAsync.rejected, (state, action) => {
                 state.addStatus = 'failed';
                 if (action.payload) {
@@ -234,9 +156,7 @@ export const selectStatus = (state) => state.subcodes.status;
 export const allVendors = (state) => state.subcodes.vendors;
 export const allDocuments = (state) => state.subcodes.documents;
 export const count = (state) => state.subcodes.count;
-export const multipleCodeStatus = (state) => state.subcodes.multiCodeStatus;
 export const addCodeStatus = (state) => state.subcodes.addStatus;
 export const updateError = (state) => state.subcodes.updateCodeError;
-export const multiAddCodeError = (state) => state.subcodes.multiCodeError;
 export const updateStatus = (state) => state.subcodes.updateCodeStatus;
 export default subcodeSlice.reducer;
