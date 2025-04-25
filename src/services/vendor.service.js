@@ -20,6 +20,30 @@ export const getAllVendors = (allvendor) => {
         })
 }
 
+export const listAllVendors = (page, per_page) => {
+    const auth = JSON.parse(localStorage.getItem('user'));
+    const config = {
+        headers: {
+            'Authorization': `Bearer ${auth.access}`
+        },
+        params: {
+            page: page,
+        }
+    };
+    if (per_page) {
+        config.params.page_size = per_page;
+    } else {
+        config.params.page_size = 10;
+    }
+    return API.get("vendor", config)
+        .then(response => { 
+            return response; 
+        },
+        error => { 
+            return error; 
+        })
+}
+
 export const addVendor = (data) => {
     const auth = JSON.parse(localStorage.getItem('user'));
 

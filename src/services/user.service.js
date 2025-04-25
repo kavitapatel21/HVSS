@@ -1,12 +1,20 @@
 import API from './api';
 
-export const getAllUsers = () => {
+export const getAllUsers = (page, per_page) => {
     const auth = JSON.parse(localStorage.getItem('user'));
     const config = {
         headers: {
             'Authorization': `Bearer ${auth.access}`
         },
+        params: {
+            page: page,
+        }
     };
+    if (per_page) {
+        config.params.page_size = per_page;
+    } else {
+        config.params.page_size = 10;
+    }
     return API.get("user", config)
         .then(response => { 
             if (response.status == 200) {

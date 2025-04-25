@@ -4,6 +4,10 @@ import Search from "../../assets/images/search.svg";
 import Export from "../../assets/images/Export.svg";
 import Subcodes from "../../assets/images/code.svg";
 import CloseSidebar from "../../assets/images/close.svg";
+import Settings from "../../assets/images/settings.svg";
+import Products from "../../assets/images/products.svg";
+import Results from "../../assets/images/results.svg";
+import Scraping from "../../assets/images/scraper.svg";
 import { NavLink } from 'react-router-dom';
 
 const Sidebar = () => {
@@ -42,7 +46,27 @@ const Sidebar = () => {
             </NavLink>
             </>
             )}
-            
+            <NavLink to="#" className="logo text-white flex-wrap d-flex align-items-center jusfify-content-start">
+                <img src={Scraping} width={22} height={22} className="me-4" alt="Sidebar" />
+                <span>Scraping</span>
+                <ul className="submenu">
+                  <li>
+                    <NavLink to="/results" activeClassName="active" className="submenu-item">
+                      <img src={Results} width={22} height={22} className="me-2" alt="Sidebar" /> Results
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/upload-products" activeClassName="active" className="submenu-item">
+                      <img src={Products} width={22} height={22} className="me-2" alt="Sidebar" />Upload Products
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/settings" activeClassName="active" className="submenu-item">
+                      <img src={Settings} width={22} height={22} className="me-2" alt="Sidebar" />Settings
+                    </NavLink>
+                  </li>
+                </ul>
+            </NavLink>
         </div>
       </div>
     );

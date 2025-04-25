@@ -2,7 +2,7 @@ import Header from "../../Layout/Header"
 import Sidebar from "../../Layout/Sidebar"
 import IcoMore from "../../../assets/images/more.svg";
 import { useEffect, useState } from "react";
-import { listVendorsAsync, allVendors, deleteVendorAsync } from "../../../features/vendorSlice";
+import { listAllVendorsAsync, vendorsList, deleteVendorAsync, setCurrentPage, selectCurrentPage, count } from "../../../features/vendorSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -12,24 +12,39 @@ import AddVendor from "./AddVendor";
 import EditVendor from "./EditVendor";
 import Table from 'react-bootstrap/Table';
 import { showConfirmationDialog } from "../../../utils/SweetAlert";
+import Pagination from "../Pagination";
+import Loader from "../../loader";
 
 const Vendors = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
     const dispatch = useDispatch();
     let navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [totalPage, setTotalPages] = useState(0);
+    const [perPage, setPerPage] = useState(10);
+    const [offset, setOffset] = useState(0);
 
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
+    const currentPage = useSelector(selectCurrentPage);
+    const getcount = useSelector(count);
+    const vendors = useSelector(vendorsList);
+    const [editedRow, setEditedRow] = useState(null);
 
     useEffect(() => {
         if (!isAddPopupOpen || !isEditPopupOpen) {
-            dispatch(listVendorsAsync());
+            setIsLoading(true);
+            dispatch(listAllVendorsAsync({currentPage, perPage})).finally(() => setIsLoading(false));
         }
-    }, [dispatch, isAddPopupOpen, isEditPopupOpen]);
+    }, [dispatch, isAddPopupOpen, isEditPopupOpen, currentPage, perPage]);
+    
+    useEffect(() => {
+        if (getcount && perPage) {
+          const pages = Math.ceil(getcount / perPage);
+          setTotalPages(pages);
+        }
+    }, [getcount, perPage]);
 
-    const vendors = useSelector(allVendors);
-
-    const [editedRow, setEditedRow] = useState(null);
     const handleEditPopup = (row) => {
         setEditedRow(row);
         setIsEditPopupOpen(true);
@@ -55,11 +70,18 @@ const Vendors = () => {
             true,
             async () => {
                 await dispatch(deleteVendorAsync(vendor));
-                dispatch(listVendorsAsync());
+                dispatch(listAllVendorsAsync({currentPage, perPage}));
                 toast.success('Vendor deleted Successfully !');
           }
         );
     }
+
+    const handlePageChange = ({ selected }) => {
+        dispatch(setCurrentPage(selected + 1));
+        const currentPage = selected + 1;
+        dispatch(listAllVendorsAsync({currentPage, perPage}));
+        setOffset(selected * perPage);
+    };
 
     return (
       <div className="d-flex">  
@@ -85,7 +107,15 @@ const Vendors = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {vendors && vendors.length > 0 && vendors.map((vendor, i) => {
+                        {isLoading ? (
+                        <Loader />
+                        ) : 
+                        (vendors && vendors.length === 0) ?  (
+                            <tr>
+                            <td colSpan="6" className="text-center">No data found</td>
+                            </tr>
+                        ) : 
+                        (vendors && vendors.length > 0 && vendors.map((vendor, i) => {
                             return (
                             <tr key={i}>
                                 <td>{i+1}</td>
@@ -103,9 +133,8 @@ const Vendors = () => {
                                     </Dropdown>
                                 </td>
                             </tr>
-                        )
-                        })
-                        } 
+                        )})
+                        )}
                         </tbody>
                     </Table>
                     {isAddPopupOpen && (
@@ -119,8 +148,13 @@ const Vendors = () => {
                         <Modal.Header closeButton> Edit Vendor </Modal.Header>
                         <Modal.Body><EditVendor rowData={editedRow} onClose={closeEditPopup}/> </Modal.Body>
                     </Modal>
-                )}
+                    )}
                 </div>
+                <Pagination
+                    totalPage={totalPage}
+                    handlePageChange={handlePageChange}
+                    currentPage={currentPage}
+                />
             </div>
         </div>
       </div>

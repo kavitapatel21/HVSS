@@ -29,6 +29,7 @@ export function Login() {
   const errorMessage = useSelector(getError);
 
   useEffect(() => {
+    console.log(status)
     if (isLoggedIn && status == 'succeeded') {
       navigate("/home"); // Redirect to home after successful login
     } else if(status == 'failed') {
@@ -66,7 +67,7 @@ export function Login() {
             <div className='form-group mb-4'>
               <label htmlFor="password" className='label-title mb-2 d-block w-100 text-left'>Password</label>
               <div className='position-relative'>
-              <img
+                <img
                   src={showPassword ? PasswordHide : PasswordShow}
                   className='ico_float right c-pointer'
                   alt='Password'

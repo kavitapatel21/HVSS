@@ -114,7 +114,9 @@ export const homeSearchSlice = createSlice({
             .addCase(checkImportFile.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.checkStatus = action.payload.data ? action.payload.data[0] : '';
-                state.uploadError = action.payload.data ? action.payload.data[0].error_message : '';
+                if (action.payload.data[0]) {
+                    state.uploadError = action.payload.data[0].error_message ? action.payload.data[0].error_message : '';
+                }
             })
     },
 });

@@ -6,6 +6,7 @@ import userReducer from "../features/userSlice";
 import importReducer from "../features/importFileSlice";
 import vendorReducer from "../features/vendorSlice";
 import documentReducer from "../features/documentSlice";
+import scrapingReducer from "../features/scrapingSlice";
 
 export default configureStore({
     reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
         extractImportedData: importReducer,
         vendors: vendorReducer,
         documents: documentReducer,
+        scrapedetails: scrapingReducer,
     },
 });

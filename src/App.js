@@ -7,6 +7,7 @@ import PrivateRoutes from './utils/ProtectedRoutes';
 import Subcodes from './components/Pages/subcodes/Subcodes';
 import AddRules from './components/Pages/subcodes/AddRule';
 import Users from './components/Pages/users/Users';
+import UploadProducts from './components/Pages/Scraping/UploadProducts';
 
 import {
   BrowserRouter as Router,
@@ -18,6 +19,9 @@ import Extract from './components/Pages/Import/ExtractData';
 import Format from './components/Pages/Import/FormatData';
 import Toast from './utils/toast';
 import Vendors from './components/Pages/vendors/Vendors';
+import Results from './components/Pages/Scraping/Results';
+import ProductDetails from './components/Pages/Scraping/ProductDetails';
+import Settings from './components/Pages/Scraping/Settings';
 
 function App() {
   return (
@@ -36,6 +40,10 @@ function App() {
             <Route path="/extract" element={<Extract />} />
             <Route path="/format" element={<Format />} />
             <Route path="/vendors" element={<Vendors />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/upload-products" element={<UploadProducts />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
           </Route>
         </Routes>
         <Toast />

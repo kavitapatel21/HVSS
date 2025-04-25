@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { login, checkLogin, loggedOut } from "../services/auth.service";
 import { useNavigate } from 'react-router-dom';
+import { act } from 'react';
 
 export const loginAsync = createAsyncThunk(
     'login/login',
@@ -9,13 +10,11 @@ export const loginAsync = createAsyncThunk(
             const response = await login(data);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
-            } else if(response.response.status === 401) {
-                return rejectWithValue(response.response.data.data.detail);
             } else {
                 return rejectWithValue(response);
             }
         } catch (err) {
-            return rejectWithValue(err.message); // Use rejectWithValue to dispatch rejected action
+            return rejectWithValue(err.detail); // Use rejectWithValue to dispatch rejected action
         }
     }
 );
@@ -32,18 +31,17 @@ export const checkLoginAsync = createAsyncThunk(
             localStorage.setItem('user', JSON.stringify(user));
             return response.data;
         } else {
+            console.log(response);
             if (response.response.status == 400) {
-                
                 const logoutResponse = await loggedOut(refreshToken);
                 if (logoutResponse.status) {
-                    
                     let navigate = useNavigate();
                     navigate('/login');
                     console.log('Hii')
                 }
             } else {
                 return rejectWithValue(response.data);
-            } 
+            }
         }
       } catch (error) {
         return rejectWithValue(error.message);
@@ -74,8 +72,9 @@ export const loginSlice = createSlice({
             })
             .addCase(loginAsync.rejected, (state, action) => {
                 state.status = 'failed';
+                console.log(action)
                 if (action.payload) {
-                    state.error = action.payload ? action.payload : action.payload.message;
+                    state.error = action.payload ? action.payload : action.payload;
                 } else {
                     state.error = action.error.message; // Fallback to action.error.message if payload is not available
                 }

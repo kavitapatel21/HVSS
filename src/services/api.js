@@ -2,7 +2,7 @@ import axios from 'axios';
 import { checkLogin, loggedOut } from "../services/auth.service";
 
 const axiosInstance = axios.create({
-    baseURL: `http://54.218.129.223/api/v1/`,
+    baseURL: `https://hydeparktool.com/api/v1`,
 });
 
 let isRefreshing = false;
@@ -24,7 +24,7 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
       const status = error.response ? error.response.status : null;
-      if (status === 401) {
+      if (status === 401 && JSON.parse(localStorage.getItem('user'))) {
         const originalRequest = error.config;
         if (!isRefreshing) {
             isRefreshing = true;
@@ -48,9 +48,8 @@ axiosInstance.interceptors.response.use(
         // Wait for the token refresh to complete
         return refreshPromise;
       }
-      
-      return Promise.reject(error);
+      return Promise.reject(error.response.data.data);
     }
-  );
+);
 
-  export default axiosInstance;
+export default axiosInstance;

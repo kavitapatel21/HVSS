@@ -3,34 +3,46 @@ import Sidebar from "../../Layout/Sidebar"
 import IcoSearch from "../../../assets/images/search_ico.svg"
 import IcoMore from "../../../assets/images/more.svg";
 import { useEffect, useState } from "react";
-import { listUsersAsync, selectUsers, deleteUserAsync } from "../../../features/userSlice";
+import { listUsersAsync, selectUsers, deleteUserAsync, setCurrentPage, selectCurrentPage, count } from "../../../features/userSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import { Modal } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
 import AddUser from "./AddUser";
 import EditUser from "./EditUser";
 import Table from 'react-bootstrap/Table';
 import { showConfirmationDialog } from "../../../utils/SweetAlert";
+import Pagination from "../Pagination";
+import Loader from "../../loader";
 
 const Users = () => {
     const authUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
     const dispatch = useDispatch();
-    let navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [totalPage, setTotalPages] = useState(0);
+    const [perPage, setPerPage] = useState(10);
+    const [offset, setOffset] = useState(0);
+    const users = useSelector(selectUsers);
+    const currentPage = useSelector(selectCurrentPage);
+    const getcount = useSelector(count);
+    const [editedRow, setEditedRow] = useState(null);
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
 
     useEffect(() => {
         if (!isAddPopupOpen || !isEditPopupOpen) {
-            dispatch(listUsersAsync());
+            setIsLoading(true);
+            dispatch(listUsersAsync({currentPage, perPage})).finally(() => setIsLoading(false));
         }
-    }, [dispatch, isAddPopupOpen, isEditPopupOpen]);
+    }, [dispatch, isAddPopupOpen, isEditPopupOpen, currentPage, perPage]);
 
-    const users = useSelector(selectUsers);
-
-    const [editedRow, setEditedRow] = useState(null);
+    useEffect(() => {
+        if (getcount && perPage) {
+          const pages = Math.ceil(getcount / perPage);
+          setTotalPages(pages);
+        }
+    }, [getcount, perPage]);
+    
     const handleEditPopup = (row) => {
         setEditedRow(row);
         setIsEditPopupOpen(true);
@@ -56,11 +68,18 @@ const Users = () => {
             true,
             async () => {
                 await dispatch(deleteUserAsync(user));
-                dispatch(listUsersAsync());
+                dispatch(listUsersAsync({currentPage, perPage}));
                 toast.success('User deleted Successfully!')
           }
         );
     }
+
+    const handlePageChange = ({ selected }) => {
+        dispatch(setCurrentPage(selected + 1));
+        const currentPage = selected + 1;
+        dispatch(listUsersAsync({currentPage, perPage}));
+        setOffset(selected * perPage);
+    };
 
     return (
       <div className="d-flex">  
@@ -86,7 +105,15 @@ const Users = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {users && users.length > 0 && users.map((user, i) => {
+                        {isLoading ? (
+                        <Loader />
+                        ) : 
+                        (users && users.length === 0) ?  (
+                            <tr>
+                            <td colSpan="6" className="text-center">No data found</td>
+                            </tr>
+                        ) : 
+                        (users && users.length > 0 && users.map((user, i) => {
                             return (
                             <tr key={i}>
                                 <td>{i+1}</td>
@@ -104,9 +131,8 @@ const Users = () => {
                                     </Dropdown>
                                 </td>
                             </tr>
-                        )
-                        })
-                        } 
+                        )})
+                        )}
                         </tbody>
                     </Table>
                     {isAddPopupOpen && (
@@ -120,8 +146,13 @@ const Users = () => {
                         <Modal.Header closeButton> Edit User </Modal.Header>
                         <Modal.Body><EditUser rowData={editedRow} onClose={closeEditPopup}/> </Modal.Body>
                     </Modal>
-                )}
+                    )}
                 </div>
+                <Pagination
+                    totalPage={totalPage}
+                    handlePageChange={handlePageChange}
+                    currentPage={currentPage}
+                />
             </div>
         </div>
       </div>

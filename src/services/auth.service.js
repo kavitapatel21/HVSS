@@ -4,10 +4,10 @@ export const login = (data) => {
     return API.post("login", data)
     .then(response => {
         return response;
-    },
-    error => {
-        return error; 
     })
+    .catch(error => {
+        return Promise.reject(error);
+    });
 }
 
 export const checkLogin = (token) => {

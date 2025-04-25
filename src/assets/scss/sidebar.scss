@@ -19,5 +19,25 @@
                 background-color: #1497C2;
             }
         }
+        .submenu {
+            list-style: none;
+            padding-left: 0px;
+            margin: 10px 0 0 0;
+            width: 100%;
+            a {
+                text-align: left;
+                position: relative;
+                padding-left: 40px;
+                display: flex;
+                align-items: center;
+            }
+        }
+        
+        .submenu-item {
+            padding: 10px;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
     }
 }

@@ -7,15 +7,16 @@ const initialState = {
     message: null,
     count: 0,
     error: null,
-    users: null
+    users: null,
+    currentPage: 1,
 };
 
 export const listUsersAsync = createAsyncThunk(
     'user/list',
-    async (arg, { dispatch, rejectWithValue }) => {
+    async (data, { dispatch, rejectWithValue }) => {
         try {
-            const response = await getAllUsers();
-            console.log(response)
+            const {currentPage, perPage} = data;
+            const response = await getAllUsers(currentPage, perPage);
             if (response.status === 200) {
                 return response.data; // If successful, return the response data
             } else {
@@ -78,7 +79,15 @@ export const deleteUserAsync = createAsyncThunk(
 export const userSlice = createSlice({
     name: 'users',
     initialState,
-    reducers: {},
+    reducers: {
+        setCurrentPage: (state, action) => {
+            console.log(action)
+            state.currentPage = action.payload == 0 ? 1 : action.payload;
+        },
+        setTotalPages: (state, action) => {
+            state.totalPages = action.payload.data.count;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(listUsersAsync.pending, (state) => { })
@@ -93,10 +102,13 @@ export const userSlice = createSlice({
             .addCase(listUsersAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.users = action.payload.data.results;
+                state.count = action.payload.data.count;
             })
     },
 });
 
-
-export const selectUsers = (state) => state.users.users;
 export default userSlice.reducer;
+export const { setCurrentPage, setTotalPages } = userSlice.actions;
+export const selectUsers = (state) => state.users.users;
+export const selectCurrentPage = state => state.users.currentPage;
+export const count = (state) => state.users.count;
